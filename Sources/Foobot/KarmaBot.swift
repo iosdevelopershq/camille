@@ -2,6 +2,8 @@ import Bot
 import Sugar
 import Foundation
 
+import Redbird
+
 enum KarmaAction {
     case Add
     case Remove
@@ -54,10 +56,17 @@ struct KarmaBotOptions {
 final class KarmaBot: SlackMessageService {
     //MARK: - Private Properties
     private let options: KarmaBotOptions
+    private let config: Config
     
     //MARK: - Lifecycle
     init(options: KarmaBotOptions) {
         self.options = options
+        
+        let config = try! Config(
+            supportedItems: AllConfigItems(),
+            source: DefaultConfigDataSource
+        )
+        self.config = config
     }
     
     //MARK: - Event Dispatch
@@ -143,14 +152,25 @@ final class KarmaBot: SlackMessageService {
     }
     private func adjustKarma(of user: User, action: KarmaAction, storage: Storage) {
         do {
-            let count: Int = storage.get(.in("Karma"), key: user.id, or: 0)
+            //let count: Int = storage.get(.in("Karma"), key: user.id, or: 0)
             
+            let urlString: String = try self.config.value(for: StorageURL.self)
+            guard
+                let url = URL(string: urlString),
+                let host = url.host,
+                let port = url.port,
+                let password = url.password
+                else { fatalError("invalidURL: \(urlString)") }
+            
+            let redisConfig = RedbirdConfig(address: host, port: UInt16(port), password: password)
+            let client = try Redbird(config: redisConfig)
+            try client.command("SET", params: ["Foo"] + ["bar"])
             
 //            this line fails vvv
 //            try storage.set(.in("Karma"), key: user.id, value: action.operation(count, 1))
 //            break it down and see what the failure is
 //            also try a simple storage.set(.shared, key: "foo", value: "bar")
-            try storage.set(.shared, key: "foo", value: "bar")
+//            try storage.set(.shared, key: "foo", value: "bar")
             
         } catch let error {
             print("Unable to update Karma: \(error)")
