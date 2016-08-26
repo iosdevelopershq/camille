@@ -144,7 +144,13 @@ final class KarmaBot: SlackMessageService {
     private func adjustKarma(of user: User, action: KarmaAction, storage: Storage) {
         do {
             let count: Int = storage.get(.in("Karma"), key: user.id, or: 0)
-            try storage.set(.in("Karma"), key: user.id, value: action.operation(count, 1))
+            
+            
+//            this line fails vvv
+//            try storage.set(.in("Karma"), key: user.id, value: action.operation(count, 1))
+//            break it down and see what the failure is
+//            also try a simple storage.set(.shared, key: "foo", value: "bar")
+            try storage.set(.shared, key: "foo", value: "bar")
             
         } catch let error {
             print("Unable to update Karma: \(error)")
