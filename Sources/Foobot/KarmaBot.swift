@@ -164,7 +164,7 @@ final class KarmaBot: SlackMessageService {
             
             let redisConfig = RedbirdConfig(address: host, port: UInt16(port), password: password)
             let client = try Redbird(config: redisConfig)
-            try client.command("SET", params: ["Foo"] + ["bar"])
+            try client.command("SET", params: ["Foo", "bar"])
             
 //            this line fails vvv
 //            try storage.set(.in("Karma"), key: user.id, value: action.operation(count, 1))
