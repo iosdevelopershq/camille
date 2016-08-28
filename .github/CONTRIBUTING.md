@@ -12,8 +12,10 @@ issue trackers and slack channels.
 
 
 
-
-Work in progress...
+<details> 
+  <summary> </summary>
+   <p>
+   Work in progress...
 
 ## Contributing Code
 
@@ -34,3 +36,5 @@ Others will give constructive feedback.
 This is a time for discussion and improvements,
 and making the necessary changes will be required before we can
 merge the contribution.
+   </p> 
+</details>
