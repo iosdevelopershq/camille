@@ -1,3 +1,7 @@
+<p align="center">
+<image src="https://raw.githubusercontent.com/iosdevelopershq/Foobot/master/foobot.jpg" width="190" height="180" />
+</p>
+
 # Foobot
 Foobot is the Slack bot for iOS Developers HQ, built with Swift.
 
