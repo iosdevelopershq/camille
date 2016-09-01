@@ -10,7 +10,8 @@ Foobot is the Slack bot for iOS Developers HQ, built with Swift using [Chameleon
 
 ## Contributing
 Want to add a new feature to Foobot? found a bug?<br />
-Head over and read our [Contribution Guide](https://github.com/iosdevelopershq/Foobot/blob/master/.github/CONTRIBUTING.md) to get started!
+Head over and read our [Contribution Guide](https://github.com/iosdevelopershq/Foobot/blob/master/.github/CONTRIBUTING.md) to get started!<br />
+Once you are setup have a look at Chameleons [API Guide](https://github.com/ChameleonBot/Bot/blob/master/API.md)
 
 ## Contact
 [iOS Developers](http://ios-developers.io)
