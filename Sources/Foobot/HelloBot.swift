@@ -2,7 +2,7 @@ import Bot
 import Sugar
 
 final class HelloBot: SlackMessageService {
-    override func message(slackBot: SlackBot, webApi: WebAPI, message: MessageDecorator, previous: MessageDecorator?) throws {
+    override func messageEvent(slackBot: SlackBot, webApi: WebAPI, message: MessageDecorator, previous: MessageDecorator?) throws {
         let greetings = ["hello", "hi", "hey"]
         guard
             let target = message.target, let sender = message.sender
