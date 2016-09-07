@@ -107,7 +107,7 @@ final class KarmaBot: SlackMessageService {
         let request = ChatPostMessage(target: target, text: response)
         try webApi.execute(request)
     }
-    private func reactionEvent(slackBot: SlackBot, webApi: WebAPI, reaction: String, user: User, itemCreator: User?, target: Target?) throws {
+    private func reactionEvent(slackBot: SlackBot, webApi: WebAPI, reaction: String, user: User, itemCreator: User?, target: SlackTargetType?) throws {
         guard
             let target = target,
             let itemCreator = itemCreator,
@@ -159,7 +159,7 @@ final class KarmaBot: SlackMessageService {
             print("Unable to update Karma: \(error)")
         }
     }
-    private func isKarmaChannel(_ target: Target) -> Bool {
+    private func isKarmaChannel(_ target: SlackTargetType) -> Bool {
         guard let targets = self.options.targets else { return true }
         return targets.contains { $0 == target.name || $0 == "*" }
     }
