@@ -64,6 +64,7 @@ extension Type: SwiftDocModelType {
 }
 
 extension Type: ChatPostMessageRepresentable {
+    //
     func makeChatPostMessage(target: SlackTargetType) -> ChatPostMessage {
         let result = SlackMessage(target: target, options: [.parse(.none)])
             .text("\(self.name) (\(self.kind))", formatting: .Code)
@@ -75,7 +76,7 @@ extension Type: ChatPostMessageRepresentable {
                     .text(property.name)
                     .newLine()
             }
-            //.text(self.comment)
+            .text(self.comment)
         
         return result.apiMethod()
     }
@@ -83,8 +84,9 @@ extension Type: ChatPostMessageRepresentable {
 
 extension SlackMessage {
     func forEach<S: Sequence>(seq: S, function: (SlackMessage, S.Iterator.Element) -> SlackMessage) -> SlackMessage {
-        seq.forEach { _ = function(self, $0) }
-        return self
+        return seq.reduce(self) { message, element in
+            return function(message, element)
+        }
     }
 }
 
