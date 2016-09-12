@@ -1,1 +1,1 @@
-web: Foobot --config:servers.default.port=$PORT
+web: Camille --config:servers.default.port=$PORT
