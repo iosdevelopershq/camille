@@ -2,8 +2,6 @@ import Bot
 import Sugar
 import Foundation
 
-import Redbird
-
 enum KarmaAction {
     case Add
     case Remove
