@@ -94,7 +94,7 @@ class SwiftDocService: SlackMessageService, SlackConnectionService {
             try webApi.execute(type.makeChatPostMessage(target: target))
             
         } catch let error {
-            let reply = SlackMessage(target: target).text(String(error))
+            let reply = SlackMessage(target: target).text(String(describing: error))
             try webApi.execute(reply.apiMethod())
         }
     }
