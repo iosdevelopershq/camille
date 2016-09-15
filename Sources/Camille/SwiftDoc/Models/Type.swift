@@ -64,21 +64,118 @@ extension Type: SwiftDocModelType {
 }
 
 extension Type: ChatPostMessageRepresentable {
-    //
-    func makeChatPostMessage(target: SlackTargetType) -> ChatPostMessage {
-        let result = SlackMessage(target: target, options: [.parse(.none)])
-            .text("\(self.name) (\(self.kind))", formatting: .Code)
-            .newLine()
-            .text("Properties:", formatting: .Bold)
-            .newLine()
-            .forEach(seq: self.properties.prefix(2)) { message, property in
-                return message
-                    .text(property.name)
-                    .newLine()
-            }
-            .text(self.comment)
+    func makeChatPostMessage(target: SlackTargetType) throws -> ChatPostMessage {
+        let type = self.name.capitalized
+        let text = "<http://swiftdoc.org/type/\(type)/|\(type)>"
         
-        return result.apiMethod()
+        let json: [String: Any] = [
+            "fallback": text,
+            "text": text,
+        ]
+        var attachment = try MessageAttachment.makeModel(with: SlackModelBuilder.make(json: json))
+        attachment.fields = try self.fields()
+        attachment.actions = try self.actions()
+        
+        return ChatPostMessage(
+            target: target,
+            text: "",
+            //options: [ChatPostMessageOption],
+            attachments: [attachment]
+        )
+    }
+    
+    func fields() throws -> [MessageAttachmentField] {
+        var fields = [MessageAttachmentField]()
+        
+        fields.append(try MessageAttachmentField.makeModel(with: SlackModelBuilder.make(json: [
+                "title": "Type",
+                "value": self.kind,
+                "short": false
+            ]))
+        )
+        
+        return fields
+        
+        /*
+        if !self.allInherits.isEmpty {
+            let json: [String: Any] = [
+                "title": "Inherits",
+                "value": self.allInherits.joined(separator: ", "),
+                "short": true
+                ]
+            fields.append(try MessageAttachmentField.makeModel(with: SlackModelBuilder.make(json: json)))
+        }
+        if !self.allInherited.isEmpty {
+            let json: [String: Any] = [
+                "title": "Inherited",
+                "value": self.allInherited.joined(separator: ", "),
+                "short": true
+                ]
+            fields.append(try MessageAttachmentField.makeModel(with: SlackModelBuilder.make(json: json)))
+        }
+        return fields
+         */
+    }
+    func actions() throws -> [MessageAttachmentAction] {
+        var buttons = [MessageAttachmentAction]()
+
+        if !self.inits.isEmpty {
+            let buttonJson: [String: Any] = [
+                "name": "Initalisers",
+                "text": "Initalisers",
+                "value": "Initalisers",
+                "type": "button",
+                ]
+            buttons.append(try MessageAttachmentAction.makeModel(with: SlackModelBuilder.make(json: buttonJson)))
+        }
+        if !self.functions.isEmpty {
+            let buttonJson: [String: Any] = [
+                "name": "Functions",
+                "text": "Functions",
+                "value": "Functions",
+                "type": "button",
+                ]
+            buttons.append(try MessageAttachmentAction.makeModel(with: SlackModelBuilder.make(json: buttonJson)))
+        }
+        if !self.properties.isEmpty {
+            let buttonJson: [String: Any] = [
+                "name": "Properties",
+                "text": "Properties",
+                "value": "Properties",
+                "type": "button",
+                ]
+            buttons.append(try MessageAttachmentAction.makeModel(with: SlackModelBuilder.make(json: buttonJson)))
+        }
+        if !self.subscripts.isEmpty {
+            let buttonJson: [String: Any] = [
+                "name": "Subscripts",
+                "text": "Subscripts",
+                "value": "Subscripts",
+                "type": "button",
+                ]
+            buttons.append(try MessageAttachmentAction.makeModel(with: SlackModelBuilder.make(json: buttonJson)))
+        }
+        
+        if !self.allInherits.isEmpty {
+            let buttonJson: [String: Any] = [
+                "name": "Inherits",
+                "text": "Inherits",
+                "value": "Inherits",
+                "type": "button",
+                ]
+            buttons.append(try MessageAttachmentAction.makeModel(with: SlackModelBuilder.make(json: buttonJson)))
+        }
+        if !self.allInherited.isEmpty {
+            let buttonJson: [String: Any] = [
+                "name": "Inherited",
+                "text": "Inherited",
+                "value": "Inherited",
+                "type": "button",
+                ]
+            buttons.append(try MessageAttachmentAction.makeModel(with: SlackModelBuilder.make(json: buttonJson)))
+        }
+
+        return buttons
     }
 }
 

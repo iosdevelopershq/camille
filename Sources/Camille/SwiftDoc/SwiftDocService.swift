@@ -7,7 +7,7 @@ protocol SwiftDocModelType: DictionaryRepresentable, StringRepresentable {
 }
 
 protocol ChatPostMessageRepresentable {
-    func makeChatPostMessage(target: SlackTargetType) -> ChatPostMessage
+    func makeChatPostMessage(target: SlackTargetType) throws -> ChatPostMessage
 }
 
 let EmptySlackModels: SlackModels = (
@@ -91,7 +91,7 @@ class SwiftDocService: SlackMessageService, SlackConnectionService {
         do {
             let data = try sync.lookup(item: item)
             guard let type = data as? ChatPostMessageRepresentable else { throw SwiftDocError.unableToDisplay(item: item) }
-            try webApi.execute(type.makeChatPostMessage(target: target))
+            try webApi.execute(try type.makeChatPostMessage(target: target))
             
         } catch let error {
             let reply = SlackMessage(target: target).text(String(describing: error))
