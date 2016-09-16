@@ -23,7 +23,6 @@ final class AnnouncementBot: SlackRTMEventService {
                                    user: user)
         }
     }
-    
     func teamJoinEvent(slackBot: SlackBot, webApi: WebAPI, user: User) throws {
         guard !user.is_bot else { return }
         
