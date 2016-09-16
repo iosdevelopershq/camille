@@ -3,8 +3,9 @@ import Bot
 let bot = try SlackBot(
     configDataSource: DefaultConfigDataSource,
     authenticator: TokenAuthentication.self,
-    storage: RedisStorage.self,
+    storage: MemoryStorage.self,
     services: [
+        AnnouncementBot(),
         HelloBot(),
         KarmaBot(options: KarmaBotOptions(
             targets: ["bot-laboratory"],
