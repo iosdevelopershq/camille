@@ -5,7 +5,7 @@ import Foundation
 
 /// Handler for the `im.open` endpoint
 public class IMOpen: WebAPIMethod {
-    public typealias SuccessParameters = (IM?)
+    public typealias SuccessParameters = (IM)
     
     //MARK: - Properties
     internal let user: User
@@ -24,7 +24,6 @@ public class IMOpen: WebAPIMethod {
     
     //MARK: - Public
     public var networkRequest: HTTPRequest {
-        
         var packet = [String: Any]()
         
         packet = packet + [
@@ -47,7 +46,7 @@ public class IMOpen: WebAPIMethod {
         )
     }
     public func handle(headers: [String: String], json: [String: Any], slackModels: SlackModels) throws -> SuccessParameters {
-        guard let channel = json["channel"] as? [String: Any] else { return nil }
+        guard let channel = json["channel"] as? [String: Any] else { throw WebAPIError.invalidResponse(json: json) }
         
         return try IM.makeModel(with: SlackModelBuilder(json: channel, models: slackModels))
     }

@@ -1,19 +1,17 @@
 import Bot
 import Sugar
 
-enum AnnouncementMessage {
-    case NewMember
-    
-    func message(user: User) -> String {
-        
-        switch self {
-        case .NewMember:
-            return "Hi \(user.name)! Welcome to the ios-developer slack team!"
-        }
-    }
+struct AnnouncerConfig {
+    let newUserAnnouncement: (IM) -> ChatPostMessage
 }
 
 final class AnnouncementBot: SlackRTMEventService {
+    private let config: AnnouncerConfig
+    
+    //MARK: - Lifecycle
+    init(config: AnnouncerConfig) {
+        self.config = config
+    }
     
     //MARK: - Event Dispatch
     func configureEvents(slackBot: SlackBot, webApi: WebAPI, dispatcher: SlackRTMEventDispatcher) {
@@ -27,17 +25,9 @@ final class AnnouncementBot: SlackRTMEventService {
         guard !user.is_bot else { return }
         
         let imOpenRequest = IMOpen(user: user)
-        if let channel: IM = try webApi.execute(imOpenRequest) {
-            let message = SlackMessage(target: channel)
-                .text(self.announcement().message(user: user))
-            
-            try webApi.execute(message.apiMethod())
-        }
+        let channel = try webApi.execute(imOpenRequest)
+        let message = config.newUserAnnouncement(channel)
+        
+        try webApi.execute(message)
     }
-    
-    //MARK: - Private
-    private func announcement() -> AnnouncementMessage {
-        return AnnouncementMessage.NewMember
-    }
-    
 }
