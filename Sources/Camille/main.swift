@@ -6,7 +6,7 @@ let bot = try SlackBot(
     authenticator: TokenAuthentication.self,
     storage: RedisStorage.self,
     services: [
-        AnnouncementBot(config: AnnouncerConfig { im -> ChatPostMessage in
+        AnnouncementBot(config: AnnouncerConfig { im in
             return SlackMessage(target: im)
                 .text("Hi")
                 .user(im.user)
