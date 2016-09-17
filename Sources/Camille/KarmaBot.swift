@@ -33,6 +33,7 @@ struct KarmaBotOptions {
     let removeReaction: String?
     
     let textDistanceThreshold: Int
+    let allowedBufferCharacters: Set<Character>
     
     init(
         targets: [String]? = nil,
@@ -40,7 +41,8 @@ struct KarmaBotOptions {
         addReaction: String? = nil,
         removeText: String? = nil,
         removeReaction: String? = nil,
-        textDistanceThreshold: Int = 4
+        textDistanceThreshold: Int = 4,
+        allowedBufferCharacters: Set<Character> = [" ", ":"]
         ) {
         self.targets = targets
         self.addText = addText
@@ -48,6 +50,7 @@ struct KarmaBotOptions {
         self.removeText = removeText
         self.removeReaction = removeReaction
         self.textDistanceThreshold = textDistanceThreshold
+        self.allowedBufferCharacters = allowedBufferCharacters
     }
 }
 
@@ -134,12 +137,14 @@ final class KarmaBot: SlackMessageService {
         if
             let add = self.options.addText,
             let possibleAdd = message.text.range(of: add)?.lowerBound,
-            message.text.distance(from: userIndex, to: possibleAdd) <= self.options.textDistanceThreshold { return .Add }
+            message.text.distance(from: userIndex, to: possibleAdd) <= self.options.textDistanceThreshold,
+            message.text.substring(with: userIndex..<possibleAdd).containsOnly(characters: self.options.allowedBufferCharacters) { return .Add }
             
         else if
             let remove = self.options.removeText,
             let possibleRemove = message.text.range(of: remove)?.lowerBound,
-            message.text.distance(from: userIndex, to: possibleRemove) <= self.options.textDistanceThreshold { return .Remove }
+            message.text.distance(from: userIndex, to: possibleRemove) <= self.options.textDistanceThreshold,
+            message.text.substring(with: userIndex..<possibleRemove).containsOnly(characters: self.options.allowedBufferCharacters){ return .Remove }
         
         return nil
     }
