@@ -7,7 +7,6 @@ let bot = try SlackBot(
     services: [
         HelloBot(),
         KarmaBot(options: KarmaBotOptions(
-            targets: ["bot-laboratory"],
             addText: "++",
             removeText: "--",
             textDistanceThreshold: 4
