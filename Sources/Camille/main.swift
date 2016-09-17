@@ -2,7 +2,7 @@ import Bot
 
 let bot = try SlackBot(
     configDataSource: DefaultConfigDataSource,
-    authenticator: TokenAuthentication.self,
+    authenticator: OAuthAuthentication.self,
     storage: RedisStorage.self,
     services: [
         HelloBot(),
