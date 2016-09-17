@@ -91,17 +91,32 @@ final class KarmaBot: SlackMessageService {
     override func messageEvent(slackBot: SlackBot, webApi: WebAPI, message: MessageDecorator, previous: MessageDecorator?) throws {
         guard let target = message.target, self.isKarmaChannel(target) else { return }
         
-        let response = message
-            .mentioned_users
-            .flatMap { (user: User) -> (User, KarmaAction)? in
-                guard let karma = self.karma(for: user, from: message) else { return nil }
-                return (user, karma)
+        let response: String
+        
+        if (message.text.lowercased().hasPrefix(self.topKarmaCommand(bot: slackBot))) { // Top karma users command
+            if
+                let listCountText = message.text
+                    .substring(from: topKarmaCommand(bot: slackBot).characters.count)
+                    .components(separatedBy: " ").filter({ $0.characters.count != 0 }).first,
+                let listCount = Int(listCountText)
+            {
+                response = topKarma(maxList: listCount, in: slackBot.storage)
+            } else {
+                response = "Top what?"
             }
-            .map { user, karma in
-                self.adjustKarma(of: user, action: karma, storage: slackBot.storage)
-                return karma.randomMessage(user: user, storage: slackBot.storage)
-            }
-            .joined(separator: "\n")
+        } else { // No command found, try to find karma action
+            response = message
+                .mentioned_users
+                .flatMap { (user: User) -> (User, KarmaAction)? in
+                    guard let karma = self.karma(for: user, from: message) else { return nil }
+                    return (user, karma)
+                }
+                .map { user, karma in
+                    self.adjustKarma(of: user, action: karma, storage: slackBot.storage)
+                    return karma.randomMessage(user: user, storage: slackBot.storage)
+                }
+                .joined(separator: "\n")
+        }
         
         guard !response.isEmpty else { return }
         
@@ -165,5 +180,38 @@ final class KarmaBot: SlackMessageService {
     private func isKarmaChannel(_ target: SlackTargetType) -> Bool {
         guard let targets = self.options.targets else { return true }
         return targets.contains { $0 == target.name || $0 == "*" }
+    }
+    private func topKarmaCommand(bot: SlackBot) -> String {
+        return "<@\(bot.me.id)> top".lowercased()
+    }
+    private func topKarma(maxList: Int, in storage: Storage) -> String {
+        guard maxList != 0 else {
+            return "Top 0? You must work in QA."
+        }
+        
+        func karmaForUser(_ user: String) -> Int {
+            return storage.get(Int.self, in: .in("Karma"), key: user, or: 0)
+        }
+        let users = storage.allKeys(.in("Karma"))
+        let sortedUsersAndKarma = users
+            .map { ($0, karmaForUser($0)) }
+            .sorted(by: >)
+        
+        let responsePrefix: String
+        let numberToShow: Int
+        if (maxList > 20) {
+            numberToShow = maxList > sortedUsersAndKarma.count ? sortedUsersAndKarma.count : 20
+            responsePrefix = "Yeah, that's too many. Here's the top \(numberToShow):"
+        } else if (maxList > sortedUsersAndKarma.count) {
+            numberToShow = sortedUsersAndKarma.count
+            responsePrefix = "We only have \(numberToShow):"
+        } else {
+            numberToShow = maxList
+            responsePrefix = "Top \(numberToShow):"
+        }
+        
+        return sortedUsersAndKarma.prefix(numberToShow).reduce(responsePrefix, { (partialResponse, userAndKarma) in
+            partialResponse + "\n<@\(userAndKarma.0)>: \(userAndKarma.1)"
+        })
     }
 }
