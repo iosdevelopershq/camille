@@ -195,8 +195,8 @@ final class KarmaBot: SlackMessageService {
         let users = storage.allKeys(.in("Karma"))
         let sortedUsersAndKarma = users
             .map { ($0, karmaForUser($0)) }
-            .sorted(by: >)
-        
+            .sorted(by: { $0.1 > $1.1 })
+            
         let responsePrefix: String
         let numberToShow: Int
         if (maxList > 20) {
