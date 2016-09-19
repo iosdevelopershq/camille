@@ -7,7 +7,7 @@ struct Deinit {
 
 extension Deinit: SwiftDocModelType {
     static func make(from json: [String : Any]) throws -> Deinit {
-        let builder = SlackModelBuilder(json: json, models: EmptySlackModels)
+        let builder = SlackModelBuilder.make(json: json)
         
         return Deinit(
             kind: try builder.value(defaultable: "kind"),

@@ -8,7 +8,7 @@ struct Generic {
 
 extension Generic: SwiftDocModelType {
     static func make(from json: [String : Any]) throws -> Generic {
-        let builder = SlackModelBuilder(json: json, models: EmptySlackModels)
+        let builder = SlackModelBuilder.make(json: json)
         
         return Generic(
             line: try builder.value(defaultable: "line"),

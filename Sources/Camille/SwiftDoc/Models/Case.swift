@@ -10,7 +10,7 @@ struct Case {
 
 extension Case: SwiftDocModelType {
     static func make(from json: [String : Any]) throws -> Case {
-        let builder = SlackModelBuilder(json: json, models: EmptySlackModels)
+        let builder = SlackModelBuilder.make(json: json)
         
         return Case(
             kind: try builder.value(defaultable: "kind"),

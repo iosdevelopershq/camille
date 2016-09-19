@@ -10,7 +10,7 @@ struct Typealias {
 
 extension Typealias: SwiftDocModelType {
     static func make(from json: [String : Any]) throws -> Typealias {
-        let builder = SlackModelBuilder(json: json, models: EmptySlackModels)
+        let builder = SlackModelBuilder.make(json: json)
         
         return Typealias(
             kind: try builder.value(defaultable: "kind"),

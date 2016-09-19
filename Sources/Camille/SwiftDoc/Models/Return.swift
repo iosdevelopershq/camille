@@ -7,7 +7,7 @@ struct Return {
 
 extension Return: SwiftDocModelType {
     static func make(from json: [String : Any]) throws -> Return {
-        let builder = SlackModelBuilder(json: json, models: EmptySlackModels)
+        let builder = SlackModelBuilder.make(json: json)
         
         return Return(
             line: try builder.value(defaultable: "line"),

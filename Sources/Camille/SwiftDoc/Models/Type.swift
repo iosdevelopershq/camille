@@ -26,7 +26,7 @@ struct Type {
 
 extension Type: SwiftDocModelType {
     static func make(from json: [String : Any]) throws -> Type {
-        let builder = SlackModelBuilder(json: json, models: EmptySlackModels)
+        let builder = SlackModelBuilder.make(json: json)
         
         var generic: Generic? = nil
         if let data: [String: Any] = try builder.optional(at: "generic") {

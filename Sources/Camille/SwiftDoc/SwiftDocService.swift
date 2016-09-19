@@ -10,14 +10,6 @@ protocol ChatPostMessageRepresentable {
     func makeChatPostMessage(target: SlackTargetType) throws -> ChatPostMessage
 }
 
-let EmptySlackModels: SlackModels = (
-    users: [],
-    channels: [],
-    groups: [],
-    ims: [],
-    team: nil
-)
-
 extension Array: DefaultableType {
     public static var `default`: Array<Element> { return [] }
 }

@@ -10,7 +10,7 @@ struct Parameter {
 
 extension Parameter: SwiftDocModelType {
     static func make(from json: [String : Any]) throws -> Parameter {
-        let builder = SlackModelBuilder(json: json, models: EmptySlackModels)
+        let builder = SlackModelBuilder.make(json: json)
         
         return Parameter(
             name: try builder.value(defaultable: "name"),

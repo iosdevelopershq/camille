@@ -16,7 +16,7 @@ struct Subscript {
 
 extension Subscript: SwiftDocModelType {
     static func make(from json: [String : Any]) throws -> Subscript {
-        let builder = SlackModelBuilder(json: json, models: EmptySlackModels)
+        let builder = SlackModelBuilder.make(json: json)
         
         let params: [[String: Any]] = try builder.value(defaultable: "params")
         var ret: Return? = nil

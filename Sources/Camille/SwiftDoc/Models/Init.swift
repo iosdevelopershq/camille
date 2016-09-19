@@ -17,7 +17,7 @@ struct Init {
 
 extension Init: SwiftDocModelType {
     static func make(from json: [String : Any]) throws -> Init {
-        let builder = SlackModelBuilder(json: json, models: EmptySlackModels)
+        let builder = SlackModelBuilder.make(json: json)
         
         var generic: Generic? = nil
         if let data: [String: Any] = try builder.optional(at: "generic") {

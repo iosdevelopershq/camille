@@ -22,7 +22,7 @@ struct Function {
 
 extension Function: SwiftDocModelType {
     static func make(from json: [String : Any]) throws -> Function {
-        let builder = SlackModelBuilder(json: json, models: EmptySlackModels)
+        let builder = SlackModelBuilder.make(json: json)
         
         var generic: Generic? = nil
         if let json: [String: Any] = try builder.optional(at: "generic") {

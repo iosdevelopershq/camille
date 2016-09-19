@@ -20,7 +20,7 @@ struct Property {
 
 extension Property: SwiftDocModelType {
     static func make(from json: [String : Any]) throws -> Property {
-        let builder = SlackModelBuilder(json: json, models: EmptySlackModels)
+        let builder = SlackModelBuilder.make(json: json)
         
         return Property(
             kind: try builder.value(defaultable: "kind"),

@@ -22,7 +22,7 @@ struct Protocol {
 
 extension Protocol: SwiftDocModelType {
     static func make(from json: [String : Any]) throws -> Protocol {
-        let builder = SlackModelBuilder(json: json, models: EmptySlackModels)
+        let builder = SlackModelBuilder.make(json: json)
         
         let operators: [[String: Any]] = try builder.value(defaultable: "operators")
         let functions: [[String: Any]] = try builder.value(defaultable: "functions")

@@ -14,7 +14,7 @@ struct Operator {
 
 extension Operator: SwiftDocModelType {
     static func make(from json: [String : Any]) throws -> Operator {
-        let builder = SlackModelBuilder(json: json, models: EmptySlackModels)
+        let builder = SlackModelBuilder.make(json: json)
         
         let functions: [[String: Any]] = try builder.value(defaultable: "functions")
         
