@@ -153,13 +153,13 @@ final class KarmaBot: SlackMessageService {
             let add = self.options.addText,
             let possibleAdd = message.text.range(of: add)?.lowerBound,
             message.text.distance(from: userIndex, to: possibleAdd) <= self.options.textDistanceThreshold,
-            message.text.substring(with: userIndex..<possibleAdd).containsOnly(characters: self.options.allowedBufferCharacters) { return .Add }
+            message.text.substring(with: userIndex..<possibleAdd).contains(only: self.options.allowedBufferCharacters) { return .Add }
             
         else if
             let remove = self.options.removeText,
             let possibleRemove = message.text.range(of: remove)?.lowerBound,
             message.text.distance(from: userIndex, to: possibleRemove) <= self.options.textDistanceThreshold,
-            message.text.substring(with: userIndex..<possibleRemove).containsOnly(characters: self.options.allowedBufferCharacters){ return .Remove }
+            message.text.substring(with: userIndex..<possibleRemove).contains(only: self.options.allowedBufferCharacters){ return .Remove }
         
         return nil
     }
