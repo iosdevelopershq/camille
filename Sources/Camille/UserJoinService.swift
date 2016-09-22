@@ -1,21 +1,21 @@
 import Bot
 import Sugar
 
-struct AnnouncerConfig {
+struct UserJoinConfig {
     let newUserAnnouncement: (IM) -> ChatPostMessage
 }
 
-final class AnnouncementService: SlackRTMEventService {
-    private let config: AnnouncerConfig
+final class UserJoinService: SlackRTMEventService {
+    private let config: UserJoinConfig
     
     //MARK: - Lifecycle
-    init(config: AnnouncerConfig) {
+    init(config: UserJoinConfig) {
         self.config = config
     }
     
     //MARK: - Event Dispatch
     func configureEvents(slackBot: SlackBot, webApi: WebAPI, dispatcher: SlackRTMEventDispatcher) {
-        dispatcher.onEvent(team_join.self) { (user) in
+        dispatcher.onEvent(team_join.self) { user in
             try self.teamJoinEvent(slackBot: slackBot,
                                    webApi: webApi,
                                    user: user)
