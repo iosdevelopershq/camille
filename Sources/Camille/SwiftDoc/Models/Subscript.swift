@@ -14,20 +14,12 @@ struct Subscript {
     let declarationURL: String
 }
 
-extension Subscript: SwiftDocModelType {
-    static func make(from json: [String : Any]) throws -> Subscript {
-        let builder = SlackModelBuilder.make(json: json)
-        
-        let params: [[String: Any]] = try builder.value(defaultable: "params")
-        var ret: Return? = nil
-        if let data: [String: Any] = try builder.optional(at: "ret") {
-            ret = try Return.make(from: data)
-        }
-        
-        return Subscript(
+extension Subscript: ModelType {
+    static func makeModel(with builder: ModelBuilder) throws -> Subscript {
+        return try tryMake(builder, Subscript(
             kind: try builder.value(defaultable: "kind"),
-            params: try params.map({ try Parameter.make(from: $0) }),
-            ret: ret,
+            params: try builder.value(model: "params"),
+            ret: try builder.optional(model: "ret"),
             line: try builder.value(defaultable: "line"),
             comment: try builder.value(defaultable: "comment"),
             signature: try builder.value(defaultable: "signature"),
@@ -35,6 +27,6 @@ extension Subscript: SwiftDocModelType {
             declaration: try builder.value(defaultable: "declaration"),
             uniqueSignatureURL: try builder.value(defaultable: "uniqueSignatureURL"),
             declarationURL: try builder.value(defaultable: "declarationURL")
-        )
+        ))
     }
 }

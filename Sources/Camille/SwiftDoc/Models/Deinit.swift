@@ -5,13 +5,11 @@ struct Deinit {
     let comment: String
 }
 
-extension Deinit: SwiftDocModelType {
-    static func make(from json: [String : Any]) throws -> Deinit {
-        let builder = SlackModelBuilder.make(json: json)
-        
-        return Deinit(
+extension Deinit: ModelType {
+    static func makeModel(with builder: ModelBuilder) throws -> Deinit {
+        return try tryMake(builder, Deinit(
             kind: try builder.value(defaultable: "kind"),
             comment: try builder.value(defaultable: "comment")
-        )
+        ))
     }
 }

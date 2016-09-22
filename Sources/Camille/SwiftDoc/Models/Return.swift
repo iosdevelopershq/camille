@@ -5,13 +5,11 @@ struct Return {
     let types: [String]
 }
 
-extension Return: SwiftDocModelType {
-    static func make(from json: [String : Any]) throws -> Return {
-        let builder = SlackModelBuilder.make(json: json)
-        
-        return Return(
+extension Return: ModelType {
+    static func makeModel(with builder: ModelBuilder) throws -> Return {
+        return try tryMake(builder, Return(
             line: try builder.value(defaultable: "line"),
             types: try builder.value(defaultable: "types")
-        )
+        ))
     }
 }

@@ -6,14 +6,12 @@ struct Generic {
     let types: [String]
 }
 
-extension Generic: SwiftDocModelType {
-    static func make(from json: [String : Any]) throws -> Generic {
-        let builder = SlackModelBuilder.make(json: json)
-        
-        return Generic(
+extension Generic: ModelType {
+    static func makeModel(with builder: ModelBuilder) throws -> Generic {
+        return try tryMake(builder, Generic(
             line: try builder.value(defaultable: "line"),
             formatted: try builder.value(defaultable: "formatted"),
             types: try builder.value(defaultable: "types")
-        )
+        ))
     }
 }

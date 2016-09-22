@@ -12,13 +12,9 @@ struct Operator {
     let functions: [OperatorFunction]
 }
 
-extension Operator: SwiftDocModelType {
-    static func make(from json: [String : Any]) throws -> Operator {
-        let builder = SlackModelBuilder.make(json: json)
-        
-        let functions: [[String: Any]] = try builder.value(defaultable: "functions")
-        
-        return Operator(
+extension Operator: ModelType {
+    static func makeModel(with builder: ModelBuilder) throws -> Operator {
+        return try tryMake(builder, Operator(
             kind: try builder.value(defaultable: "kind"),
             place: try builder.value(defaultable: "place"),
             name: try builder.value(defaultable: "name"),
@@ -27,7 +23,7 @@ extension Operator: SwiftDocModelType {
             associativity: try builder.value(defaultable: "associativity"),
             precedence: try builder.value(defaultable: "precedence"),
             comment: try builder.value(defaultable: "comment"),
-            functions: try functions.map({ try OperatorFunction.make(from: $0) })
-        )
+            functions: try builder.value(model: "functions")
+        ))
     }
 }

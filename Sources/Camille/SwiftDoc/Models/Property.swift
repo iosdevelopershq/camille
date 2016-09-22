@@ -18,11 +18,9 @@ struct Property {
     let declarationURL: String
 }
 
-extension Property: SwiftDocModelType {
-    static func make(from json: [String : Any]) throws -> Property {
-        let builder = SlackModelBuilder.make(json: json)
-        
-        return Property(
+extension Property: ModelType {
+    static func makeModel(with builder: ModelBuilder) throws -> Property {
+        return try tryMake(builder, Property(
             kind: try builder.value(defaultable: "kind"),
             note: try builder.value(defaultable: "note"),
             final: try builder.value(defaultable: "final"),
@@ -37,6 +35,6 @@ extension Property: SwiftDocModelType {
             declaration: try builder.value(defaultable: "declaration"),
             uniqueSignatureURL: try builder.value(defaultable: "uniqueSignatureURL"),
             declarationURL: try builder.value(defaultable: "declarationURL")
-        )
+        ))
     }
 }

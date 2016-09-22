@@ -20,18 +20,9 @@ struct Protocol {
     let requiresSelf: Bool
 }
 
-extension Protocol: SwiftDocModelType {
-    static func make(from json: [String : Any]) throws -> Protocol {
-        let builder = SlackModelBuilder.make(json: json)
-        
-        let operators: [[String: Any]] = try builder.value(defaultable: "operators")
-        let functions: [[String: Any]] = try builder.value(defaultable: "functions")
-        let properties: [[String: Any]] = try builder.value(defaultable: "properties")
-        let aliases: [[String: Any]] = try builder.value(defaultable: "aliases")
-        let inits: [[String: Any]] = try builder.value(defaultable: "inits")
-        let subscripts: [[String: Any]] = try builder.value(defaultable: "subscripts")
-        
-        return Protocol(
+extension Protocol: ModelType {
+    static func makeModel(with builder: ModelBuilder) throws -> Protocol {
+        return try tryMake(builder, Protocol(
             kind: try builder.value(defaultable: "kind"),
             name: try builder.value(defaultable: "name"),
             slug: try builder.value(defaultable: "slug"),
@@ -39,16 +30,16 @@ extension Protocol: SwiftDocModelType {
             inherited: try builder.value(defaultable: "inherited"),
             allInherited: try builder.value(defaultable: "allInherited"),
             attr: try builder.value(defaultable: "attr"),
-            operators: try operators.map({ try Operator.make(from: $0) }),
-            functions: try functions.map({ try Function.make(from: $0) }),
+            operators: try builder.value(defaultable: "operators"),
+            functions: try builder.value(defaultable: "functions"),
             types: try builder.value(defaultable: "types"),
-            properties: try properties.map({ try Property.make(from: $0) }),
-            aliases: try aliases.map({ try Typealias.make(from: $0) }),
-            inits: try inits.map({ try Init.make(from: $0) }),
-            subscripts: try subscripts.map({ try Subscript.make(from: $0) }),
+            properties: try builder.value(defaultable: "properties"),
+            aliases: try builder.value(defaultable: "aliases"),
+            inits: try builder.value(defaultable: "inits"),
+            subscripts: try builder.value(defaultable: "subscripts"),
             imp: try builder.optional(at: "imp"),
             comment: try builder.value(defaultable: "comment"),
             requiresSelf: try builder.value(defaultable: "requiresSelf")
-        )
+        ))
     }
 }

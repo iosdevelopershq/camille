@@ -15,20 +15,12 @@ struct Init {
     let declarationURL: String
 }
 
-extension Init: SwiftDocModelType {
-    static func make(from json: [String : Any]) throws -> Init {
-        let builder = SlackModelBuilder.make(json: json)
-        
-        var generic: Generic? = nil
-        if let data: [String: Any] = try builder.optional(at: "generic") {
-            generic = try Generic.make(from: data)
-        }
-        let params: [[String: Any]] = try builder.value(defaultable: "params")
-        
-        return Init(
+extension Init: ModelType {
+    static func makeModel(with builder: ModelBuilder) throws -> Init {
+        return try tryMake(builder, Init(
             kind: try builder.value(defaultable: "kind"),
-            generic: generic,
-            params: try params.map({ try Parameter.make(from: $0) }),
+            generic: try builder.optional(model: "generic"),
+            params: try builder.value(model: "params"),
             init: try builder.value(defaultable: "init"),
             note: try builder.value(defaultable: "note"),
             comment: try builder.value(defaultable: "comment"),
@@ -37,6 +29,6 @@ extension Init: SwiftDocModelType {
             declaration: try builder.value(defaultable: "declaration"),
             uniqueSignatureURL: try builder.value(defaultable: "uniqueSignatureURL"),
             declarationURL: try builder.value(defaultable: "declarationURL")
-        )
+        ))
     }
 }

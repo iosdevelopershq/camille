@@ -20,29 +20,15 @@ struct Function {
     let declarationURL: String
 }
 
-extension Function: SwiftDocModelType {
-    static func make(from json: [String : Any]) throws -> Function {
-        let builder = SlackModelBuilder.make(json: json)
-        
-        var generic: Generic? = nil
-        if let json: [String: Any] = try builder.optional(at: "generic") {
-            generic = try Generic.make(from: json)
-        }
-        
-        let params: [[String: Any]] = try builder.value(defaultable: "params")
-        
-        var ret: Return? = nil
-        if let json: [String: Any] = try builder.optional(at: "ret") {
-            ret = try Return.make(from: json)
-        }
-        
-        return Function(
+extension Function: ModelType {
+    static func makeModel(with builder: ModelBuilder) throws -> Function {
+        return try tryMake(builder, Function(
             kind: try builder.value(defaultable: "kind"),
             name: try builder.value(defaultable: "name"),
             slug: try builder.value(defaultable: "slug"),
-            generic: generic,
-            params: try params.map({ try Parameter.make(from: $0) }),
-            ret: ret,
+            generic: try builder.optional(model: "generic"),
+            params: try builder.value(model: "params"),
+            ret: try builder.optional(model: "ret"),
             throws: try builder.value(defaultable: "throws"),
             note: try builder.value(defaultable: "note"),
             attr: try builder.value(defaultable: "attr"),
@@ -53,6 +39,6 @@ extension Function: SwiftDocModelType {
             declaration: try builder.value(defaultable: "declaration"),
             uniqueSignatureURL: try builder.value(defaultable: "uniqueSignatureURL"),
             declarationURL: try builder.value(defaultable: "declarationURL")
-        )
+        ))
     }
 }

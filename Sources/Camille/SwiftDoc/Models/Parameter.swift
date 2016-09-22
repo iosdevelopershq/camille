@@ -8,16 +8,14 @@ struct Parameter {
     let types: [String]
 }
 
-extension Parameter: SwiftDocModelType {
-    static func make(from json: [String : Any]) throws -> Parameter {
-        let builder = SlackModelBuilder.make(json: json)
-        
-        return Parameter(
+extension Parameter: ModelType {
+    static func makeModel(with builder: ModelBuilder) throws -> Parameter {
+        return try tryMake(builder, Parameter(
             name: try builder.value(defaultable: "name"),
             type: try builder.value(defaultable: "type"),
             note: try builder.value(defaultable: "note"),
             default: try builder.value(defaultable: "default"),
             types: try builder.value(defaultable: "types")
-        )
+        ))
     }
 }

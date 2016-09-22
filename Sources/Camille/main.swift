@@ -7,8 +7,8 @@ let bot = try SlackBot(
     storage: MemoryStorage.self,
     services: [
         SwiftDocService(),
-        HelloService(),
-        KarmaService(options: KarmaServiceOptions(
+        HelloBot(),
+        KarmaBot(options: KarmaBotOptions(
             addText: "++",
             removeText: "--",
             textDistanceThreshold: 4
