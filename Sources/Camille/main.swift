@@ -8,9 +8,9 @@ let bot = try SlackBot(
     services: [
         AnnouncementBot(config: AnnouncerConfig { im in
             return SlackMessage(target: im)
-                .text("Hi")
+                .text("Hi,")
                 .user(im.user)
-                .text("Welcome to the ios-developer slack team!")
+                .text(", welcome to the ios-developer slack team!")
                 .apiMethod()
         }),
         HelloBot(),
