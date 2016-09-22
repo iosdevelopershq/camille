@@ -6,19 +6,24 @@ let bot = try SlackBot(
     authenticator: OAuthAuthentication.self,
     storage: RedisStorage.self,
     services: [
-        AnnouncementService(config: AnnouncerConfig { im in
-            return SlackMessage(target: im)
-                .text("Hi,")
-                .user(im.user)
-                .text(", welcome to the ios-developer slack team!")
-                .apiMethod()
-        }),
         HelloBot(),
         KarmaBot(options: KarmaBotOptions(
             addText: "++",
             removeText: "--",
             textDistanceThreshold: 4
-        ))
+        )),
+        TimedMessageService(config: TimedMessageConfig(interval: 3600.0, target: "intro") { target in
+            return SlackMessage(target: target)
+                .text("Welcome new team members!")
+                .apiMethod()
+        }),
+        UserJoinService(config: UserJoinConfig(newUserAnnouncement: { im in
+            return SlackMessage(target: im)
+                .text("Hi,")
+                .user(im.user)
+                .text(", welcome to the ios-developer slack team!")
+                .apiMethod()
+        }))
     ]
 )
 
