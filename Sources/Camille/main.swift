@@ -3,7 +3,7 @@ import Sugar
 
 let bot = try SlackBot(
     configDataSource: DefaultConfigDataSource,
-    authenticator: TokenAuthentication.self,
+    authenticator: OAuthAuthentication.self,
     storage: RedisStorage.self,
     services: [
         HelloBot(),
@@ -13,11 +13,6 @@ let bot = try SlackBot(
             removeText: "--",
             textDistanceThreshold: 4
         )),
-        TimedMessageService(config: TimedMessageConfig(interval: 3600.0, target: "intro") { target in
-            return SlackMessage(target: target)
-                .text("Welcome new team members!")
-                .apiMethod()
-        }),
         UserJoinService(config: UserJoinConfig(newUserAnnouncement: { im in
             return SlackMessage(target: im)
                 .text("Hi,")
