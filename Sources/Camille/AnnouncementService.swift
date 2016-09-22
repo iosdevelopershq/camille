@@ -5,7 +5,7 @@ struct AnnouncerConfig {
     let newUserAnnouncement: (IM) -> ChatPostMessage
 }
 
-final class AnnouncementBot: SlackRTMEventService {
+final class AnnouncementService: SlackRTMEventService {
     private let config: AnnouncerConfig
     
     //MARK: - Lifecycle
