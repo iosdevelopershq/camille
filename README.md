@@ -1,5 +1,5 @@
 <p align="center">
-<image src="https://raw.githubusercontent.com/iosdevelopershq/Foobot/master/foobot.jpg" width="190" height="180" />
+<image src="https://raw.githubusercontent.com/iosdevelopershq/Foobot/master/camille.jpg" width="190" height="180" />
 </p>
 
 # Camille
