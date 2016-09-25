@@ -15,11 +15,11 @@ final class HelloBot: SlackMessageService {
 fileprivate extension HelloBot {
     func sayHello(to sender: User, in target: SlackTargetType, with webApi: WebAPI) -> (PatternMatchResult) throws -> Void {
         return { match in
-            let message = SlackMessage(target: target)
-                .text(match.value(named: "greeting"))
-                .user(sender)
+            let message = try SlackMessage()
+                .line(match.value(named: "greeting"), " ", sender)
+                .makeChatPostMessage(target: target)
             
-            try webApi.execute(message.apiMethod())
+            try webApi.execute(message)
         }
     }
 }

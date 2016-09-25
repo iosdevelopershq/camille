@@ -2,7 +2,7 @@ import Bot
 import Sugar
 
 struct UserJoinConfig {
-    let newUserAnnouncement: (IM) -> ChatPostMessage
+    let newUserAnnouncement: (IM) throws -> ChatPostMessage
 }
 
 final class UserJoinService: SlackRTMEventService {
@@ -26,7 +26,7 @@ final class UserJoinService: SlackRTMEventService {
         
         let imOpenRequest = IMOpen(user: user)
         let channel = try webApi.execute(imOpenRequest)
-        let message = config.newUserAnnouncement(channel)
+        let message = try config.newUserAnnouncement(channel)
         
         try webApi.execute(message)
     }

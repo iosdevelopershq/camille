@@ -5,7 +5,7 @@ import Foundation
 struct TimedMessageConfig {
     let interval: TimeInterval
     let target: String
-    let announcement: (SlackTargetType) -> ChatPostMessage
+    let announcement: (SlackTargetType) throws -> ChatPostMessage
 }
 
 final class TimedMessageService: SlackRTMEventService {
@@ -33,7 +33,7 @@ final class TimedMessageService: SlackRTMEventService {
         guard let channel = data.channels.filter({ $0.name == config.target }).first
             else { return }
         
-        let message = config.announcement(channel)
+        let message = try config.announcement(channel)
         
         try webApi.execute(message)
     }

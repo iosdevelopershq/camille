@@ -13,11 +13,9 @@ let bot = try SlackBot(
             textDistanceThreshold: 4
         )),
         UserJoinService(config: UserJoinConfig(newUserAnnouncement: { im in
-            return SlackMessage(target: im)
-                .text("Hi,")
-                .user(im.user)
-                .text(", welcome to the ios-developer slack team!")
-                .apiMethod()
+            return try SlackMessage()
+                .line("Hi, ", im.user, ", welcome to the ios-developer slack team!")
+                .makeChatPostMessage(target: im)
         }))
     ]
 )
