@@ -18,7 +18,7 @@ extension Subscript: ModelType {
     static func makeModel(with builder: ModelBuilder) throws -> Subscript {
         return try tryMake(builder, Subscript(
             kind: try builder.value(defaultable: "kind"),
-            params: try builder.value(model: "params"),
+            params: try builder.value(models: "params"),
             ret: try builder.optional(model: "ret"),
             line: try builder.value(defaultable: "line"),
             comment: try builder.value(defaultable: "comment"),

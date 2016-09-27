@@ -23,7 +23,7 @@ extension Operator: ModelType {
             associativity: try builder.value(defaultable: "associativity"),
             precedence: try builder.value(defaultable: "precedence"),
             comment: try builder.value(defaultable: "comment"),
-            functions: try builder.value(model: "functions")
+            functions: try builder.value(models: "functions")
         ))
     }
 }

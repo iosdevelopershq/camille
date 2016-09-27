@@ -39,9 +39,7 @@ fileprivate extension SwiftDocService {
                 let message = try data.makeInteractiveButtonChatPostMessage(
                     target: target,
                     responder: self,
-                    handler: { response in
-                        print(response)
-                    }
+                    handler: self.showDetails(with: webApi)
                 )
                 
                 try webApi.execute(message)
@@ -50,6 +48,20 @@ fileprivate extension SwiftDocService {
                 let reply = SlackMessage().add(segment: String(describing: error))
                 try webApi.execute(reply.makeChatPostMessage(target: target))
             }
+        }
+    }
+}
+
+fileprivate extension SwiftDocService {
+    func showDetails(with webApi: WebAPI) -> (InteractiveButtonResponse) throws -> Void {
+        return { response in
+            /*
+            let message = try SlackMessage()
+                .line("hey")
+                .makeChatPostMessage(target: response.channel)
+            
+            try webApi.execute(message)
+            */
         }
     }
 }

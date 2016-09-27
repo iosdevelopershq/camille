@@ -20,7 +20,7 @@ extension Init: ModelType {
         return try tryMake(builder, Init(
             kind: try builder.value(defaultable: "kind"),
             generic: try builder.optional(model: "generic"),
-            params: try builder.value(model: "params"),
+            params: try builder.value(models: "params"),
             init: try builder.value(defaultable: "init"),
             note: try builder.value(defaultable: "note"),
             comment: try builder.value(defaultable: "comment"),

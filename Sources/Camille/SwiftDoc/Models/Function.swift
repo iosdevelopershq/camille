@@ -27,7 +27,7 @@ extension Function: ModelType {
             name: try builder.value(defaultable: "name"),
             slug: try builder.value(defaultable: "slug"),
             generic: try builder.optional(model: "generic"),
-            params: try builder.value(model: "params"),
+            params: try builder.value(models: "params"),
             ret: try builder.optional(model: "ret"),
             throws: try builder.value(defaultable: "throws"),
             note: try builder.value(defaultable: "note"),

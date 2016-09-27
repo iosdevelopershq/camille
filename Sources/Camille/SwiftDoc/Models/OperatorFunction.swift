@@ -27,7 +27,7 @@ extension OperatorFunction: ModelType {
             slug: try builder.value(defaultable: "slug"),
             generic: try builder.optional(model: "generic"),
             place: try builder.value(defaultable: "place"),
-            params: try builder.value(model: "params"),
+            params: try builder.value(models: "params"),
             ret: try builder.optional(model: "ret"),
             attr: try builder.value(defaultable: "attr"),
             line: try builder.value(defaultable: "line"),
