@@ -55,13 +55,14 @@ fileprivate extension SwiftDocService {
 fileprivate extension SwiftDocService {
     func showDetails(with webApi: WebAPI) -> (InteractiveButtonResponse) throws -> Void {
         return { response in
-            /*
-            let message = try SlackMessage()
+            let message = try SlackMessage(
+                    responseType: .ephemeral,
+                    responseUrl: response.response_url
+                )
                 .line("hey")
                 .makeChatPostMessage(target: response.channel)
             
             try webApi.execute(message)
-            */
         }
     }
 }
