@@ -26,6 +26,16 @@ let bot = try SlackBot(
                     .makeChatPostMessage(target: im)
             }
         )),
+        TopicService(config: TopicServiceConfig(
+            userAllowed: { user in
+                return user.is_admin
+            },
+            warning: { channel, user in
+                return try SlackMessage()
+                    .line(user, " only admins can change the topic.")
+                    .makeChatPostMessage(target: channel)
+            }
+        )),
         HelloService(),
         KarmaService(options: KarmaServiceOptions(
             addText: "++",
