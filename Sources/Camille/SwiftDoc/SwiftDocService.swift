@@ -57,7 +57,8 @@ fileprivate extension SwiftDocService {
         return { response in
             let message = try SlackMessage(
                     responseType: .ephemeral,
-                    responseUrl: response.response_url
+                    responseUrl: response.response_url,
+                    replaceOriginal: false
                 )
                 .line("hey")
                 .makeChatPostMessage(target: response.channel)
