@@ -33,13 +33,16 @@ fileprivate extension SwiftDocService {
             let type: String = match.value(named: "type")
             
             do {
-                guard let data = try sync.lookup(item: type) as? InteractiveButtonChatPostMessageRepresentable
+                let modelType = try sync.lookup(item: type)
+                
+                guard
+                    let data = modelType as? InteractiveButtonChatPostMessageRepresentable
                     else { throw SwiftDocError.unableToDisplay(item: type) }
                 
                 let message = try data.makeInteractiveButtonChatPostMessage(
                     target: target,
                     responder: self,
-                    handler: self.showDetails(with: webApi)
+                    handler: self.showDetails(with: webApi, modelType: modelType)
                 )
                 
                 try webApi.execute(message)
@@ -53,14 +56,14 @@ fileprivate extension SwiftDocService {
 }
 
 fileprivate extension SwiftDocService {
-    func showDetails(with webApi: WebAPI) -> (InteractiveButtonResponse) throws -> Void {
+    func showDetails(with webApi: WebAPI, modelType: ModelType) -> (InteractiveButtonResponse) throws -> Void {
         return { response in
             let message = try SlackMessage(
                     responseType: .ephemeral,
                     responseUrl: response.response_url,
                     replaceOriginal: false
                 )
-                .line("hey")
+                .add(segment: "<http://swiftdoc.org/v3.0/type/String/hierarchy/index.svg>")
                 .makeChatPostMessage(target: response.channel)
             
             try webApi.execute(message)
