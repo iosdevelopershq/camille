@@ -38,7 +38,7 @@ final class CrossPostService: SlackMessageService, SlackInteractiveButtonRespond
             self.messages = []
             
             guard
-                let target = slackBot.currentSlackModelData().channels.filter({ $0.name == self.config.reportingTarget }).first
+                let target = slackBot.target(nameOrId: self.config.reportingTarget)
                 else { return }
             
             try webApi.execute(message.makeChatPostMessage(target: target))
