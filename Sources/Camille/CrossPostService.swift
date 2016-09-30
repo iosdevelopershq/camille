@@ -58,12 +58,13 @@ fileprivate extension CrossPostService {
         let message = SlackMessage()
             .line("Cross Post Alert:".bold)
             .line("The following cross posts have been detected:")
-        
-        duplicates.addAttachments(
-            to: message,
-            buttonResponder: self,
-            handler: self.buttonHandler(messages: messages, webApi: webApi)
-        )
+            .attachments(for: duplicates) { builder, dupes in
+                dupes.addAttachment(
+                    with: builder,
+                    buttonResponder: self,
+                    handler: self.buttonHandler(messages: dupes, webApi: webApi)
+                )
+            }
         
         return message
     }
@@ -109,20 +110,6 @@ fileprivate enum ActionButton: String {
     }
     
     static var all: [ActionButton] { return [.privateWarning, .publicWarning, .removeAll] }
-}
-fileprivate extension Sequence where Iterator.Element == [MessageDecorator] {
-    func addAttachments(to message: SlackMessage, buttonResponder: SlackInteractiveButtonResponderService, handler: @escaping InteractiveButtonResponseHandler) {
-        var message = message
-        message = self.reduce(message) { current, messages in
-            return current.attachment { builder in
-                messages.addAttachment(
-                    with: builder,
-                    buttonResponder: buttonResponder,
-                    handler: handler
-                )
-            }
-        }
-    }
 }
 fileprivate extension Sequence where Iterator.Element == MessageDecorator {
     func addAttachment(with builder: SlackMessageAttachmentBuilder, buttonResponder: SlackInteractiveButtonResponderService, handler: @escaping InteractiveButtonResponseHandler) {
