@@ -85,11 +85,17 @@ fileprivate extension CrossPostService {
         
         return !first.text.isEmpty
     }
+    func postedInMultipleChannels(messages: [MessageDecorator]) -> Bool {
+        return messages
+            .grouped { $0.target?.name ?? "" }
+            .values.count > 1
+    }
     func findCrossPosts(in messages: [MessageDecorator]) -> [[MessageDecorator]] {
         let potentialDuplicates = messages
             .grouped(by: self.uniqueMessageKey)
             .values
             .filter(self.potentialDuplicates)
+            .filter(self.postedInMultipleChannels)
         
         return Array(potentialDuplicates)
     }
