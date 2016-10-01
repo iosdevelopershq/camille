@@ -45,6 +45,7 @@ final class CrossPostService: SlackMessageService, SlackInteractiveButtonRespond
         }
     }
     override func messageEvent(slackBot: SlackBot, webApi: WebAPI, message: MessageDecorator, previous: MessageDecorator?) throws {
+        guard previous == nil else { return } //don't add edits
         self.messages.append(message)
     }
 }
