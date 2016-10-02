@@ -116,6 +116,14 @@ fileprivate enum ActionButton: String {
         }
     }
     
+    var afterExecuted: [ActionButton] {
+        switch self {
+        case .privateWarning: return [.removeAll]
+        case .publicWarning: return [.removeAll]
+        case .removeAll: return [.privateWarning, .publicWarning]
+        }
+    }
+    
     static var all: [ActionButton] { return [.privateWarning, .publicWarning, .removeAll] }
 }
 fileprivate extension Sequence where Iterator.Element == MessageDecorator {
@@ -155,6 +163,13 @@ fileprivate extension CrossPostService {
             case .privateWarning: try self.privateWarning(messages: messages, webApi: webApi)
             case .removeAll: try self.removeAll(messages: messages, webApi: webApi)
             }
+ 
+            try self.updateWarning(
+                message: response.original_message,
+                after: action,
+                from: response,
+                webApi: webApi
+            )
         }
     }
     
@@ -193,3 +208,21 @@ fileprivate extension CrossPostService {
         }
     }
 }
+
+fileprivate extension CrossPostService {
+    func updateWarning(message: Message, after action: ActionButton, from interactiveButton: InteractiveButtonResponse, webApi: WebAPI) throws {
+        
+        let update = SlackMessage(message: message)
+            .updateAttachment(buttonResponse: interactiveButton) { builder in
+                builder.updateOrAddField(titled: "Actions Taken") { field in
+                    var values = field.value.components(separatedBy: "\n")
+                    values.append("<@\(interactiveButton.user.id)> chose: \(action.text)")
+                    field.value = values.joined(separator: "\n")
+                }
+                builder.removeButtons(matching: { !action.afterExecuted.map({ $0.rawValue }).contains($0.name) })
+            }
+        
+        try webApi.execute(try update.makeChatUpdate(to: message, in: interactiveButton.channel))
+    }
+}
+
