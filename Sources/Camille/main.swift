@@ -20,8 +20,8 @@ let bot = try SlackBot(
                     .makeChatPostMessage(target: im)
             }
         )),
-        HelloBot(),
-        KarmaBot(options: KarmaBotOptions(
+        HelloService(),
+        KarmaService(options: KarmaServiceOptions(
             addText: "++",
             removeText: "--",
             textDistanceThreshold: 4

@@ -1,7 +1,7 @@
 import Bot
 import Sugar
 
-final class HelloBot: SlackMessageService {
+final class HelloService: SlackMessageService {
     override func messageEvent(slackBot: SlackBot, webApi: WebAPI, message: MessageDecorator, previous: MessageDecorator?) throws {
         guard let target = message.target, let sender = message.sender else { return }
         
@@ -12,7 +12,7 @@ final class HelloBot: SlackMessageService {
     }
 }
 
-fileprivate extension HelloBot {
+fileprivate extension HelloService {
     func sayHello(to sender: User, in target: SlackTargetType, with webApi: WebAPI) -> (PatternMatchResult) throws -> Void {
         return { match in
             let message = try SlackMessage()

@@ -24,7 +24,7 @@ enum KarmaAction {
     }
 }
 
-struct KarmaBotOptions {
+struct KarmaServiceOptions {
     let targets: [String]?
     
     let addText: String?
@@ -54,13 +54,13 @@ struct KarmaBotOptions {
     }
 }
 
-final class KarmaBot: SlackMessageService {
+final class KarmaService: SlackMessageService {
     //MARK: - Private Properties
-    private let options: KarmaBotOptions
+    private let options: KarmaServiceOptions
     private let config: Config
     
     //MARK: - Lifecycle
-    init(options: KarmaBotOptions) {
+    init(options: KarmaServiceOptions) {
         self.options = options
         
         let config = try! Config(
