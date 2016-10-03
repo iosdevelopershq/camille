@@ -1,10 +1,16 @@
 import Bot
 import Sugar
 
+#if os(Linux)
+let StorageProvider = RedisStorage.self
+#else
+let StorageProvider = PlistStorage.self
+#endif
+
 let bot = try SlackBot(
     configDataSource: DefaultConfigDataSource,
     authenticator: OAuthAuthentication.self,
-    storage: RedisStorage.self,
+    storage: StorageProvider,
     services: [
         CrossPostService(config: CrossPostServiceConfig(
             timeSpan: 60 * 2,
