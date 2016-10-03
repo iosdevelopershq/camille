@@ -32,7 +32,7 @@ let bot = try SlackBot(
             },
             warning: { channel, user in
                 return try SlackMessage()
-                    .line(user, " only admins can change the topic.")
+                    .line("I can't let you do that, ", user, ". Only admins are allowed to change the topic.")
                     .makeChatPostMessage(target: channel)
             }
         )),
