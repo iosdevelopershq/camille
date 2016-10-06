@@ -71,8 +71,8 @@ final class KarmaService: SlackMessageService {
     }
     
     //MARK: - Event Dispatch
-    override func configureEvents(slackBot: SlackBot, webApi: WebAPI, dispatcher: SlackRTMEventDispatcher) {
-        super.configureEvents(slackBot: slackBot, webApi: webApi, dispatcher: dispatcher)
+    func configureEvents(slackBot: SlackBot, webApi: WebAPI, dispatcher: SlackRTMEventDispatcher) {
+        self.configureMessageEvent(slackBot: slackBot, webApi: webApi, dispatcher: dispatcher)
         dispatcher.onEvent(reaction_added.self) { data in
             try self.reactionEvent(
                 slackBot: slackBot,
@@ -88,7 +88,7 @@ final class KarmaService: SlackMessageService {
     }
     
     //MARK: - Event Handlers
-    override func messageEvent(slackBot: SlackBot, webApi: WebAPI, message: MessageDecorator, previous: MessageDecorator?) throws {
+    func messageEvent(slackBot: SlackBot, webApi: WebAPI, message: MessageDecorator, previous: MessageDecorator?) throws {
         guard let target = message.target, self.isKarmaChannel(target) else { return }
         
         let response: String

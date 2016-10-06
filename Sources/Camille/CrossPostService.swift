@@ -24,8 +24,8 @@ final class CrossPostService: SlackMessageService, SlackInteractiveButtonRespond
     }
     
     //MARK: - Event Routing
-    override func configureEvents(slackBot: SlackBot, webApi: WebAPI, dispatcher: SlackRTMEventDispatcher) {
-        super.configureEvents(slackBot: slackBot, webApi: webApi, dispatcher: dispatcher)
+    func configureEvents(slackBot: SlackBot, webApi: WebAPI, dispatcher: SlackRTMEventDispatcher) {
+        self.configureMessageEvent(slackBot: slackBot, webApi: webApi, dispatcher: dispatcher)
         self.timer = TimerService(id: "crossPosting", interval: self.config.timeSpan, storage: slackBot.storage, dispatcher: dispatcher) { [weak self] pong in
             guard let `self` = self else { return }
             
@@ -44,7 +44,7 @@ final class CrossPostService: SlackMessageService, SlackInteractiveButtonRespond
             try webApi.execute(message.makeChatPostMessage(target: target))
         }
     }
-    override func messageEvent(slackBot: SlackBot, webApi: WebAPI, message: MessageDecorator, previous: MessageDecorator?) throws {
+    func messageEvent(slackBot: SlackBot, webApi: WebAPI, message: MessageDecorator, previous: MessageDecorator?) throws {
         guard previous == nil else { return } //don't add edits
         self.messages.append(message)
     }

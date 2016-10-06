@@ -2,7 +2,7 @@ import Bot
 import Sugar
 
 final class HelloService: SlackMessageService {
-    override func messageEvent(slackBot: SlackBot, webApi: WebAPI, message: MessageDecorator, previous: MessageDecorator?) throws {
+    func messageEvent(slackBot: SlackBot, webApi: WebAPI, message: MessageDecorator, previous: MessageDecorator?) throws {
         guard let target = message.target, let sender = message.sender else { return }
         
         try message.routeText(
