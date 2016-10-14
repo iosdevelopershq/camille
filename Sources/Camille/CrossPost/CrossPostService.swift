@@ -2,14 +2,6 @@ import Bot
 import Sugar
 import Foundation
 
-//MARK: - Config
-struct CrossPostServiceConfig {
-    let timeSpan: TimeInterval
-    let reportingTarget: String
-    let publicWarning: (SlackTargetType, User) throws -> ChatPostMessage
-    let privateWarning: (IM) throws -> ChatPostMessage
-}
-
 //MARK: - Service
 final class CrossPostService: SlackMessageService, SlackInteractiveButtonResponderService {
     //MARK: - Properties
@@ -45,7 +37,12 @@ final class CrossPostService: SlackMessageService, SlackInteractiveButtonRespond
         }
     }
     func messageEvent(slackBot: SlackBot, webApi: WebAPI, message: MessageDecorator, previous: MessageDecorator?) throws {
-        guard previous == nil else { return } //don't add edits
+         //only add new messages and ones that meet the requirements
+        guard
+            previous == nil,
+            self.config.includeMessage(message)
+            else { return }
+        
         self.messages.append(message)
     }
 }
@@ -102,60 +99,13 @@ fileprivate extension CrossPostService {
     }
 }
 
-//MARK: - CrossPost Warning Message Generation
-fileprivate enum ActionButton: String {
-    case privateWarning
-    case publicWarning
-    case removeAll
-    
-    var text: String {
-        switch self {
-        case .privateWarning: return "Private Warning"
-        case .publicWarning: return "Public Warning"
-        case .removeAll: return "Remove all posts"
-        }
-    }
-    
-    var afterExecuted: [ActionButton] {
-        switch self {
-        case .privateWarning: return [.removeAll]
-        case .publicWarning: return [.removeAll]
-        case .removeAll: return [.privateWarning, .publicWarning]
-        }
-    }
-    
-    static var all: [ActionButton] { return [.privateWarning, .publicWarning, .removeAll] }
-}
-fileprivate extension Sequence where Iterator.Element == MessageDecorator {
-    func addAttachment(with builder: SlackMessageAttachmentBuilder, buttonResponder: SlackInteractiveButtonResponderService, handler: @escaping InteractiveButtonResponseHandler) {
-        let array = Array(self)
-        guard let user = array.first?.sender, let message = array.first else { return }
-        let channels = self
-            .flatMap { $0.target?.channel }
-            .map { "<#\($0.id)>" }
-            .joined(separator: ", ")
-        
-        builder.field(short: true, title: "User", value: "<@\(user.id)>")
-        builder.field(short: true, title: "Channels", value: channels)
-        builder.field(short: false, title: "Message Preview", value: message.text.substring(to: 50))
-        for button in ActionButton.all {
-            builder.button(
-                name: button.rawValue,
-                text: button.text,
-                responder: buttonResponder,
-                handler: handler
-            )
-        }
-    }
-}
-
 //MARK: - Cross Post Button Responder
 fileprivate extension CrossPostService {
     func buttonHandler(messages: [MessageDecorator], webApi: WebAPI) -> (InteractiveButtonResponse) throws -> Void {
         return { response in
             guard
                 let name = response.actions.first?.name,
-                let action = ActionButton(rawValue: name)
+                let action = CrossPostButton(rawValue: name)
                 else { return }
             
             switch action {
@@ -210,7 +160,7 @@ fileprivate extension CrossPostService {
 }
 
 fileprivate extension CrossPostService {
-    func updateWarning(message: Message, after action: ActionButton, from interactiveButton: InteractiveButtonResponse, webApi: WebAPI) throws {
+    func updateWarning(message: Message, after action: CrossPostButton, from interactiveButton: InteractiveButtonResponse, webApi: WebAPI) throws {
         
         let update = SlackMessage(message: message)
             .updateAttachment(buttonResponse: interactiveButton) { builder in
