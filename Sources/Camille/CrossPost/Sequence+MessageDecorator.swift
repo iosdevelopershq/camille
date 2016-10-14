@@ -1,9 +1,8 @@
 import Sugar
 
-extension Sequence where Iterator.Element == MessageDecorator {
+extension Collection where Iterator.Element == MessageDecorator {
     func addAttachment(with builder: SlackMessageAttachmentBuilder, buttonResponder: SlackInteractiveButtonResponderService, handler: @escaping InteractiveButtonResponseHandler) {
-        let array = Array(self)
-        guard let user = array.first?.sender, let message = array.first else { return }
+        guard let message = self.first, let user = message.sender else { return }
         let channels = self
             .flatMap { $0.target?.channel }
             .map { "<#\($0.id)>" }
