@@ -24,17 +24,21 @@ enum KarmaAction {
     }
 }
 
-struct KarmaServiceOptions {
-    let targets: [String]?
+final class KarmaService: SlackMessageService {
+    //MARK: - Private Properties
+    private let config: Config
     
-    let addText: String?
-    let addReaction: String?
-    let removeText: String?
-    let removeReaction: String?
+    private let targets: [String]?
     
-    let textDistanceThreshold: Int
-    let allowedBufferCharacters: Set<Character>
+    private let addText: String?
+    private let addReaction: String?
+    private let removeText: String?
+    private let removeReaction: String?
     
+    private let textDistanceThreshold: Int
+    private let allowedBufferCharacters: Set<Character>
+    
+    //MARK: - Lifecycle
     init(
         targets: [String]? = nil,
         addText: String? = nil,
@@ -51,17 +55,6 @@ struct KarmaServiceOptions {
         self.removeReaction = removeReaction
         self.textDistanceThreshold = textDistanceThreshold
         self.allowedBufferCharacters = allowedBufferCharacters
-    }
-}
-
-final class KarmaService: SlackMessageService {
-    //MARK: - Private Properties
-    private let options: KarmaServiceOptions
-    private let config: Config
-    
-    //MARK: - Lifecycle
-    init(options: KarmaServiceOptions) {
-        self.options = options
         
         let config = try! Config(
             supportedItems: AllConfigItems(),
@@ -150,22 +143,22 @@ final class KarmaService: SlackMessageService {
             else { return nil }
         
         if
-            let add = self.options.addText,
+            let add = self.addText,
             let possibleAdd = message.text.range(of: add)?.lowerBound,
-            message.text.distance(from: userIndex, to: possibleAdd) <= self.options.textDistanceThreshold,
-            message.text.substring(with: userIndex..<possibleAdd).contains(only: self.options.allowedBufferCharacters) { return .Add }
+            message.text.distance(from: userIndex, to: possibleAdd) <= self.textDistanceThreshold,
+            message.text.substring(with: userIndex..<possibleAdd).contains(only: self.allowedBufferCharacters) { return .Add }
             
         else if
-            let remove = self.options.removeText,
+            let remove = self.removeText,
             let possibleRemove = message.text.range(of: remove)?.lowerBound,
-            message.text.distance(from: userIndex, to: possibleRemove) <= self.options.textDistanceThreshold,
-            message.text.substring(with: userIndex..<possibleRemove).contains(only: self.options.allowedBufferCharacters){ return .Remove }
+            message.text.distance(from: userIndex, to: possibleRemove) <= self.textDistanceThreshold,
+            message.text.substring(with: userIndex..<possibleRemove).contains(only: self.allowedBufferCharacters){ return .Remove }
         
         return nil
     }
     private func karma(for user: User, fromReaction reaction: String) -> KarmaAction? {
-        if let add = self.options.addReaction, reaction.hasPrefix(add) { return .Add }
-        else if let remove = self.options.removeReaction, reaction.hasPrefix(remove) { return .Remove }
+        if let add = self.addReaction, reaction.hasPrefix(add) { return .Add }
+        else if let remove = self.removeReaction, reaction.hasPrefix(remove) { return .Remove }
         return nil
     }
     private func adjustKarma(of user: User, action: KarmaAction, storage: Storage) {
@@ -178,7 +171,7 @@ final class KarmaService: SlackMessageService {
         }
     }
     private func isKarmaChannel(_ target: SlackTargetType) -> Bool {
-        guard let targets = self.options.targets else { return true }
+        guard let targets = self.targets else { return true }
         return targets.contains { $0 == target.name || $0 == "*" }
     }
     private func topKarmaCommand(bot: SlackBot) -> String {

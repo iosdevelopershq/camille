@@ -40,11 +40,11 @@ let bot = try SlackBot(
             }
         ),
         HelloService(),
-        KarmaService(options: KarmaServiceOptions(
+        KarmaService(
             addText: "++",
             removeText: "--",
             textDistanceThreshold: 4
-        )),
+        ),
         UserJoinService(config: UserJoinConfig(newUserAnnouncement: { im in
             return try SlackMessage()
                 .line("Hi, ", im.user, ", welcome to the ios-developer slack team!")
