@@ -51,7 +51,7 @@ fileprivate extension TopicService {
             let channel = message.channel?.value.channel
             else { return }
         
-        if (self.userAllowed(user)) {
+        if self.userAllowed(user) {
             //update the stored topic
             try slackBot.storage.set(.in("topics"), key: channel.id, value: topic)
             
