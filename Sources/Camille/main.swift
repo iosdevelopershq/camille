@@ -12,7 +12,7 @@ let bot = try SlackBot(
     authenticator: OAuthAuthentication.self,
     storage: StorageProvider,
     services: [
-        CrossPostService(config: CrossPostServiceConfig(
+        CrossPostService(
             timeSpan: 60 * 2,
             includeMessage: { message in
                 return message.text.components(separatedBy: " ").count > 5
@@ -28,7 +28,7 @@ let bot = try SlackBot(
                     .line("Please refrain from cross-posting, it is discouraged here.")
                     .makeChatPostMessage(target: im)
             }
-        )),
+        ),
         TopicService(config: TopicServiceConfig(
             userAllowed: { user in
                 return user.is_admin
