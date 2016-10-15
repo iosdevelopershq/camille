@@ -24,7 +24,8 @@ final class TimedMessageService: SlackRTMEventService {
     }
     func pongEvent(slackBot: SlackBot, webApi: WebAPI) throws {
         let data = slackBot.currentSlackModelData()
-        guard let channel = data.channels.filter({ $0.name == target }).first
+        guard
+            let channel = data.channels.first(where: { $0.name == target })
             else { return }
         
         let message = try announcement(channel)
