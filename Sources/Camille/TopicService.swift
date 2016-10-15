@@ -4,18 +4,15 @@ import Sugar
 typealias UserAllowedClosure = (User) -> Bool
 typealias TopicWarningClosure = (Channel, User) throws -> ChatPostMessage
 
-struct TopicServiceConfig {
-    let userAllowed: UserAllowedClosure
-    let warning: TopicWarningClosure?
-}
-
 final class TopicService: SlackRTMEventService, SlackConnectionService {
     //MARK: - Properties
-    fileprivate let config: TopicServiceConfig
+    fileprivate let userAllowed: UserAllowedClosure
+    fileprivate let warning: TopicWarningClosure?
     
     //MARK: - Lifecycle
-    init(config: TopicServiceConfig) {
-        self.config = config
+    init(userAllowed: @escaping UserAllowedClosure, warning: @escaping TopicWarningClosure) {
+        self.userAllowed = userAllowed
+        self.warning = warning
     }
     
     //MARK: - Connection Event
@@ -54,7 +51,7 @@ fileprivate extension TopicService {
             let channel = message.channel?.value.channel
             else { return }
         
-        if (self.config.userAllowed(user)) {
+        if (self.userAllowed(user)) {
             //update the stored topic
             try slackBot.storage.set(.in("topics"), key: channel.id, value: topic)
             
@@ -64,7 +61,7 @@ fileprivate extension TopicService {
             _ = try webApi.execute(setTopic)
             
             //warn user if needed
-            guard let warning = self.config.warning else { return }
+            guard let warning = self.warning else { return }
             let message = try warning(channel, user)
             _ = try webApi.execute(message)
         }
