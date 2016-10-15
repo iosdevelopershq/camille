@@ -45,11 +45,11 @@ let bot = try SlackBot(
             removeText: "--",
             textDistanceThreshold: 4
         ),
-        UserJoinService(config: UserJoinConfig(newUserAnnouncement: { im in
+        UserJoinService(newUserAnnouncement: { im in
             return try SlackMessage()
                 .line("Hi, ", im.user, ", welcome to the ios-developer slack team!")
                 .makeChatPostMessage(target: im)
-        }))
+        })
     ]
 )
 
