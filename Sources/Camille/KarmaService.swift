@@ -3,13 +3,13 @@ import Sugar
 import Foundation
 
 enum KarmaAction {
-    case Add
-    case Remove
+    case add
+    case remove
     
     var operation: (Int, Int) -> Int {
         switch self {
-        case .Add: return (+)
-        case .Remove: return (-)
+        case .add: return (+)
+        case .remove: return (-)
         }
     }
     
@@ -18,8 +18,8 @@ enum KarmaAction {
         let total = "Total: \(count)"
         
         switch self {
-        case .Add: return "\(user.name) you rock! - \(total)"
-        case .Remove: return "Boooo \(user.name)! - \(total)"
+        case .add: return "\(user.name) you rock! - \(total)"
+        case .remove: return "Boooo \(user.name)! - \(total)"
         }
     }
 }
@@ -146,19 +146,19 @@ final class KarmaService: SlackMessageService {
             let add = self.addText,
             let possibleAdd = message.text.range(of: add)?.lowerBound,
             message.text.distance(from: userIndex, to: possibleAdd) <= self.textDistanceThreshold,
-            message.text.substring(with: userIndex..<possibleAdd).contains(only: self.allowedBufferCharacters) { return .Add }
+            message.text.substring(with: userIndex..<possibleAdd).contains(only: self.allowedBufferCharacters) { return .add }
             
         else if
             let remove = self.removeText,
             let possibleRemove = message.text.range(of: remove)?.lowerBound,
             message.text.distance(from: userIndex, to: possibleRemove) <= self.textDistanceThreshold,
-            message.text.substring(with: userIndex..<possibleRemove).contains(only: self.allowedBufferCharacters){ return .Remove }
+            message.text.substring(with: userIndex..<possibleRemove).contains(only: self.allowedBufferCharacters){ return .remove }
         
         return nil
     }
     private func karma(for user: User, fromReaction reaction: String) -> KarmaAction? {
-        if let add = self.addReaction, reaction.hasPrefix(add) { return .Add }
-        else if let remove = self.removeReaction, reaction.hasPrefix(remove) { return .Remove }
+        if let add = self.addReaction, reaction.hasPrefix(add) { return .add }
+        else if let remove = self.removeReaction, reaction.hasPrefix(remove) { return .remove }
         return nil
     }
     private func adjustKarma(of user: User, action: KarmaAction, storage: Storage) {
