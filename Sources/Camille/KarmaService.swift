@@ -200,17 +200,20 @@ final class KarmaService: SlackMessageService {
         let numberToShow: Int
         if maxList > 20 {
             numberToShow = maxList > users.count ? users.count : 20
-            responsePrefix = "Yeah, that's too many. Here's the top \(numberToShow):"
+            responsePrefix = "Yeah, that's too many. Here's the top"
         } else if maxList > users.count {
             numberToShow = users.count
-            responsePrefix = "We only have \(numberToShow):"
+            responsePrefix = "We only have"
         } else {
             numberToShow = maxList
-            responsePrefix = "Top \(numberToShow):"
+            responsePrefix = "Top"
         }
         
-        return users.prefix(numberToShow).reduce(responsePrefix, { partialResponse, user in
-            partialResponse + "\n<@\(user.name)>: \(user.karma)"
-        })
+        let list = users
+            .prefix(numberToShow)
+            .map { user in "<@\(user.name)>: \(user.karma)" }
+            .joined(separator: "\n")
+        
+        return "\(responsePrefix) \(numberToShow):\n\(list)"
     }
 }
