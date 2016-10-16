@@ -185,19 +185,19 @@ final class KarmaService: SlackMessageService {
         return "<@\(bot.me.id)> top".lowercased()
     }
     private func topKarma(maxList: Int, in storage: Storage) -> String {
-        guard maxList > 0 else {
-            return "Top \(maxList)? You must work in QA."
-        }
+        guard maxList > 0 else { return "Top \(maxList)? You must work in QA." }
         
         func karma(for user: String) -> Int {
             return storage.get(Int.self, in: .in("Karma"), key: user, or: 0)
         }
+        
         let users = storage.allKeys(.in("Karma"))
             .map { (name: $0, karma: karma(for: $0)) }
             .sorted(by: { $0.karma > $1.karma })
             
         let responsePrefix: String
         let numberToShow: Int
+        
         if maxList > 20 {
             numberToShow = max(users.count, 20)
             responsePrefix = "Yeah, that's too many. Here's the top"
