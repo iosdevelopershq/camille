@@ -188,7 +188,7 @@ final class KarmaService: SlackMessageService {
         guard maxList > 0 else { return "Top \(maxList)? You must work in QA." }
         
         func karma(for user: String) -> Int {
-            return storage.get(Int.self, in: .in("Karma"), key: user, or: 0)
+            return storage.get(in: .in("Karma"), key: user, or: 0)
         }
         
         let users = storage.allKeys(.in("Karma"))
