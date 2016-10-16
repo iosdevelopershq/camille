@@ -185,8 +185,8 @@ final class KarmaService: SlackMessageService {
         return "<@\(bot.me.id)> top".lowercased()
     }
     private func topKarma(maxList: Int, in storage: Storage) -> String {
-        guard maxList != 0 else {
-            return "Top 0? You must work in QA."
+        guard maxList > 0 else {
+            return "Top \(maxList)? You must work in QA."
         }
         
         func karmaForUser(_ user: String) -> Int {
