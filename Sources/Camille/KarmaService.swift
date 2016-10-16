@@ -199,7 +199,7 @@ final class KarmaService: SlackMessageService {
         let responsePrefix: String
         let numberToShow: Int
         if maxList > 20 {
-            numberToShow = maxList > users.count ? users.count : 20
+            numberToShow = max(users.count, 20)
             responsePrefix = "Yeah, that's too many. Here's the top"
         } else if maxList > users.count {
             numberToShow = users.count
