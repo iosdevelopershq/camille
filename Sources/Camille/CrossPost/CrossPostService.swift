@@ -6,23 +6,36 @@ import Foundation
 final class CrossPostService: SlackMessageService, SlackInteractiveButtonResponderService {
     //MARK: - Properties
     let buttonResponder = SlackInteractiveButtonResponder()
-    fileprivate let config: CrossPostServiceConfig
     private var timer: TimerService?
     private var messages: [MessageDecorator] = []
+    private let timeSpan: TimeInterval
+    private let includeMessage: (MessageDecorator) -> Bool
+    private let reportingTarget: String
+    fileprivate let publicWarning: (SlackTargetType, User) throws -> ChatPostMessage
+    fileprivate let privateWarning: (IM) throws -> ChatPostMessage
     
     //MARK: - Lifecycle
-    init(config: CrossPostServiceConfig) {
-        self.config = config
+    init(
+        timeSpan: TimeInterval,
+        includeMessage: @escaping (MessageDecorator) -> Bool,
+        reportingTarget: String,
+        publicWarning: @escaping (SlackTargetType, User) throws -> ChatPostMessage,
+        privateWarning: @escaping (IM) throws -> ChatPostMessage) {
+        self.timeSpan = timeSpan
+        self.includeMessage = includeMessage
+        self.reportingTarget = reportingTarget
+        self.publicWarning = publicWarning
+        self.privateWarning = privateWarning
     }
     
     //MARK: - Event Routing
     func configureEvents(slackBot: SlackBot, webApi: WebAPI, dispatcher: SlackRTMEventDispatcher) {
         self.configureMessageEvent(slackBot: slackBot, webApi: webApi, dispatcher: dispatcher)
-        self.timer = TimerService(id: "crossPosting", interval: self.config.timeSpan, storage: slackBot.storage, dispatcher: dispatcher) { [weak self] pong in
+        self.timer = TimerService(id: "crossPosting", interval: self.timeSpan, storage: slackBot.storage, dispatcher: dispatcher) { [weak self] pong in
             guard let `self` = self else { return }
             
             //get rid of messages older than config.timeSpan
-            let activeMessages = self.messages.filter(self.newerThan(timestamp: pong.timestamp, lifespan: self.config.timeSpan))
+            let activeMessages = self.messages.filter(self.newerThan(timestamp: pong.timestamp, lifespan: self.timeSpan))
             self.messages = activeMessages
             
             guard let message = self.makeCrossPostWarning(pong: pong, messages: self.messages, webApi: webApi) else { return }
@@ -30,7 +43,7 @@ final class CrossPostService: SlackMessageService, SlackInteractiveButtonRespond
             self.messages = []
             
             guard
-                let target = slackBot.target(nameOrId: self.config.reportingTarget)
+                let target = slackBot.target(nameOrId: self.reportingTarget)
                 else { return }
             
             try webApi.execute(message.makeChatPostMessage(target: target))
@@ -40,7 +53,7 @@ final class CrossPostService: SlackMessageService, SlackInteractiveButtonRespond
          //only add new messages and ones that meet the requirements
         guard
             previous == nil,
-            self.config.includeMessage(message)
+            self.includeMessage(message)
             else { return }
         
         self.messages.append(message)
@@ -129,7 +142,7 @@ fileprivate extension CrossPostService {
             let target = messages.first?.target
             else { return }
         
-        let message = try self.config.publicWarning(target, user)
+        let message = try self.publicWarning(target, user)
         try webApi.execute(message)
     }
     private func privateWarning(messages: [MessageDecorator], webApi: WebAPI) throws {
@@ -138,7 +151,7 @@ fileprivate extension CrossPostService {
         let openIm = IMOpen(user: user)
         let im = try webApi.execute(openIm)
         
-        let message = try self.config.privateWarning(im)
+        let message = try self.privateWarning(im)
         try webApi.execute(message)
     }
     private func removeAll(messages: [MessageDecorator], webApi: WebAPI) throws {

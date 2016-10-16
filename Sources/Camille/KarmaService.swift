@@ -3,13 +3,13 @@ import Sugar
 import Foundation
 
 enum KarmaAction {
-    case Add
-    case Remove
+    case add
+    case remove
     
     var operation: (Int, Int) -> Int {
         switch self {
-        case .Add: return (+)
-        case .Remove: return (-)
+        case .add: return (+)
+        case .remove: return (-)
         }
     }
     
@@ -18,23 +18,27 @@ enum KarmaAction {
         let total = "Total: \(count)"
         
         switch self {
-        case .Add: return "\(user.name) you rock! - \(total)"
-        case .Remove: return "Boooo \(user.name)! - \(total)"
+        case .add: return "\(user.name) you rock! - \(total)"
+        case .remove: return "Boooo \(user.name)! - \(total)"
         }
     }
 }
 
-struct KarmaServiceOptions {
-    let targets: [String]?
+final class KarmaService: SlackMessageService {
+    //MARK: - Private Properties
+    private let config: Config
     
-    let addText: String?
-    let addReaction: String?
-    let removeText: String?
-    let removeReaction: String?
+    private let targets: [String]?
     
-    let textDistanceThreshold: Int
-    let allowedBufferCharacters: Set<Character>
+    private let addText: String?
+    private let addReaction: String?
+    private let removeText: String?
+    private let removeReaction: String?
     
+    private let textDistanceThreshold: Int
+    private let allowedBufferCharacters: Set<Character>
+    
+    //MARK: - Lifecycle
     init(
         targets: [String]? = nil,
         addText: String? = nil,
@@ -51,17 +55,6 @@ struct KarmaServiceOptions {
         self.removeReaction = removeReaction
         self.textDistanceThreshold = textDistanceThreshold
         self.allowedBufferCharacters = allowedBufferCharacters
-    }
-}
-
-final class KarmaService: SlackMessageService {
-    //MARK: - Private Properties
-    private let options: KarmaServiceOptions
-    private let config: Config
-    
-    //MARK: - Lifecycle
-    init(options: KarmaServiceOptions) {
-        self.options = options
         
         let config = try! Config(
             supportedItems: AllConfigItems(),
@@ -93,7 +86,7 @@ final class KarmaService: SlackMessageService {
         
         let response: String
         
-        if (message.text.lowercased().hasPrefix(self.topKarmaCommand(bot: slackBot))) { // Top karma users command
+        if message.text.lowercased().hasPrefix(self.topKarmaCommand(bot: slackBot)) { // Top karma users command
             if
                 let listCountText = message.text
                     .substring(from: topKarmaCommand(bot: slackBot).characters.count)
@@ -123,6 +116,7 @@ final class KarmaService: SlackMessageService {
         let request = ChatPostMessage(target: target, text: response)
         try webApi.execute(request)
     }
+    
     private func reactionEvent(slackBot: SlackBot, webApi: WebAPI, reaction: String, user: User, itemCreator: User?, target: SlackTargetType?) throws {
         guard
             let target = target,
@@ -150,24 +144,26 @@ final class KarmaService: SlackMessageService {
             else { return nil }
         
         if
-            let add = self.options.addText,
+            let add = self.addText,
             let possibleAdd = message.text.range(of: add)?.lowerBound,
-            message.text.distance(from: userIndex, to: possibleAdd) <= self.options.textDistanceThreshold,
-            message.text.substring(with: userIndex..<possibleAdd).contains(only: self.options.allowedBufferCharacters) { return .Add }
+            message.text.distance(from: userIndex, to: possibleAdd) <= self.textDistanceThreshold,
+            message.text.substring(with: userIndex..<possibleAdd).contains(only: self.allowedBufferCharacters) { return .add }
             
         else if
-            let remove = self.options.removeText,
+            let remove = self.removeText,
             let possibleRemove = message.text.range(of: remove)?.lowerBound,
-            message.text.distance(from: userIndex, to: possibleRemove) <= self.options.textDistanceThreshold,
-            message.text.substring(with: userIndex..<possibleRemove).contains(only: self.options.allowedBufferCharacters){ return .Remove }
+            message.text.distance(from: userIndex, to: possibleRemove) <= self.textDistanceThreshold,
+            message.text.substring(with: userIndex..<possibleRemove).contains(only: self.allowedBufferCharacters){ return .remove }
         
         return nil
     }
+    
     private func karma(for user: User, fromReaction reaction: String) -> KarmaAction? {
-        if let add = self.options.addReaction, reaction.hasPrefix(add) { return .Add }
-        else if let remove = self.options.removeReaction, reaction.hasPrefix(remove) { return .Remove }
+        if let add = self.addReaction, reaction.hasPrefix(add) { return .add }
+        else if let remove = self.removeReaction, reaction.hasPrefix(remove) { return .remove }
         return nil
     }
+    
     private func adjustKarma(of user: User, action: KarmaAction, storage: Storage) {
         do {
             let count: Int = storage.get(.in("Karma"), key: user.id, or: 0)
@@ -177,41 +173,46 @@ final class KarmaService: SlackMessageService {
             print("Unable to update Karma: \(error)")
         }
     }
+    
     private func isKarmaChannel(_ target: SlackTargetType) -> Bool {
-        guard let targets = self.options.targets else { return true }
+        guard let targets = self.targets else { return true }
         return targets.contains { $0 == target.name || $0 == "*" }
     }
+    
     private func topKarmaCommand(bot: SlackBot) -> String {
         return "<@\(bot.me.id)> top".lowercased()
     }
+    
     private func topKarma(maxList: Int, in storage: Storage) -> String {
-        guard maxList != 0 else {
-            return "Top 0? You must work in QA."
-        }
+        guard maxList > 0 else { return "Top \(maxList)? You must work in QA." }
         
-        func karmaForUser(_ user: String) -> Int {
+        func karma(for user: String) -> Int {
             return storage.get(Int.self, in: .in("Karma"), key: user, or: 0)
         }
+        
         let users = storage.allKeys(.in("Karma"))
-        let sortedUsersAndKarma = users
-            .map { ($0, karmaForUser($0)) }
-            .sorted(by: { $0.1 > $1.1 })
+            .map { (name: $0, karma: karma(for: $0)) }
+            .sorted(by: { $0.karma > $1.karma })
             
         let responsePrefix: String
         let numberToShow: Int
-        if (maxList > 20) {
-            numberToShow = maxList > sortedUsersAndKarma.count ? sortedUsersAndKarma.count : 20
-            responsePrefix = "Yeah, that's too many. Here's the top \(numberToShow):"
-        } else if (maxList > sortedUsersAndKarma.count) {
-            numberToShow = sortedUsersAndKarma.count
-            responsePrefix = "We only have \(numberToShow):"
+        
+        if maxList > 20 {
+            numberToShow = max(maxList, users.count)
+            responsePrefix = "Yeah, that's too many. Here's the top"
+        } else if maxList > users.count {
+            numberToShow = users.count
+            responsePrefix = "We only have"
         } else {
             numberToShow = maxList
-            responsePrefix = "Top \(numberToShow):"
+            responsePrefix = "Top"
         }
         
-        return sortedUsersAndKarma.prefix(numberToShow).reduce(responsePrefix, { (partialResponse, userAndKarma) in
-            partialResponse + "\n<@\(userAndKarma.0)>: \(userAndKarma.1)"
-        })
+        let list = users
+            .prefix(numberToShow)
+            .map { user in "<@\(user.name)>: \(user.karma)" }
+            .joined(separator: "\n")
+        
+        return "\(responsePrefix) \(numberToShow):\n\(list)"
     }
 }
