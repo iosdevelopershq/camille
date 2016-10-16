@@ -189,29 +189,28 @@ final class KarmaService: SlackMessageService {
             return "Top \(maxList)? You must work in QA."
         }
         
-        func karmaForUser(_ user: String) -> Int {
+        func karma(for user: String) -> Int {
             return storage.get(Int.self, in: .in("Karma"), key: user, or: 0)
         }
         let users = storage.allKeys(.in("Karma"))
-        let sortedUsersAndKarma = users
-            .map { ($0, karmaForUser($0)) }
-            .sorted(by: { $0.1 > $1.1 })
+            .map { (name: $0, karma: karma(for: $0)) }
+            .sorted(by: { $0.karma > $1.karma })
             
         let responsePrefix: String
         let numberToShow: Int
         if maxList > 20 {
-            numberToShow = maxList > sortedUsersAndKarma.count ? sortedUsersAndKarma.count : 20
+            numberToShow = maxList > users.count ? users.count : 20
             responsePrefix = "Yeah, that's too many. Here's the top \(numberToShow):"
-        } else if maxList > sortedUsersAndKarma.count {
-            numberToShow = sortedUsersAndKarma.count
+        } else if maxList > users.count {
+            numberToShow = users.count
             responsePrefix = "We only have \(numberToShow):"
         } else {
             numberToShow = maxList
             responsePrefix = "Top \(numberToShow):"
         }
         
-        return sortedUsersAndKarma.prefix(numberToShow).reduce(responsePrefix, { (partialResponse, userAndKarma) in
-            partialResponse + "\n<@\(userAndKarma.0)>: \(userAndKarma.1)"
+        return users.prefix(numberToShow).reduce(responsePrefix, { partialResponse, user in
+            partialResponse + "\n<@\(user.name)>: \(user.karma)"
         })
     }
 }
