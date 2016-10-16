@@ -116,6 +116,7 @@ final class KarmaService: SlackMessageService {
         let request = ChatPostMessage(target: target, text: response)
         try webApi.execute(request)
     }
+    
     private func reactionEvent(slackBot: SlackBot, webApi: WebAPI, reaction: String, user: User, itemCreator: User?, target: SlackTargetType?) throws {
         guard
             let target = target,
@@ -156,11 +157,13 @@ final class KarmaService: SlackMessageService {
         
         return nil
     }
+    
     private func karma(for user: User, fromReaction reaction: String) -> KarmaAction? {
         if let add = self.addReaction, reaction.hasPrefix(add) { return .add }
         else if let remove = self.removeReaction, reaction.hasPrefix(remove) { return .remove }
         return nil
     }
+    
     private func adjustKarma(of user: User, action: KarmaAction, storage: Storage) {
         do {
             let count: Int = storage.get(.in("Karma"), key: user.id, or: 0)
@@ -170,41 +173,46 @@ final class KarmaService: SlackMessageService {
             print("Unable to update Karma: \(error)")
         }
     }
+    
     private func isKarmaChannel(_ target: SlackTargetType) -> Bool {
         guard let targets = self.targets else { return true }
         return targets.contains { $0 == target.name || $0 == "*" }
     }
+    
     private func topKarmaCommand(bot: SlackBot) -> String {
         return "<@\(bot.me.id)> top".lowercased()
     }
+    
     private func topKarma(maxList: Int, in storage: Storage) -> String {
-        guard maxList > 0 else {
-            return "Top \(maxList)? You must work in QA."
-        }
+        guard maxList > 0 else { return "Top \(maxList)? You must work in QA." }
         
-        func karmaForUser(_ user: String) -> Int {
+        func karma(for user: String) -> Int {
             return storage.get(Int.self, in: .in("Karma"), key: user, or: 0)
         }
+        
         let users = storage.allKeys(.in("Karma"))
-        let sortedUsersAndKarma = users
-            .map { ($0, karmaForUser($0)) }
-            .sorted(by: { $0.1 > $1.1 })
+            .map { (name: $0, karma: karma(for: $0)) }
+            .sorted(by: { $0.karma > $1.karma })
             
         let responsePrefix: String
         let numberToShow: Int
+        
         if maxList > 20 {
-            numberToShow = maxList > sortedUsersAndKarma.count ? sortedUsersAndKarma.count : 20
-            responsePrefix = "Yeah, that's too many. Here's the top \(numberToShow):"
-        } else if maxList > sortedUsersAndKarma.count {
-            numberToShow = sortedUsersAndKarma.count
-            responsePrefix = "We only have \(numberToShow):"
+            numberToShow = max(maxList, users.count)
+            responsePrefix = "Yeah, that's too many. Here's the top"
+        } else if maxList > users.count {
+            numberToShow = users.count
+            responsePrefix = "We only have"
         } else {
             numberToShow = maxList
-            responsePrefix = "Top \(numberToShow):"
+            responsePrefix = "Top"
         }
         
-        return sortedUsersAndKarma.prefix(numberToShow).reduce(responsePrefix, { (partialResponse, userAndKarma) in
-            partialResponse + "\n<@\(userAndKarma.0)>: \(userAndKarma.1)"
-        })
+        let list = users
+            .prefix(numberToShow)
+            .map { user in "<@\(user.name)>: \(user.karma)" }
+            .joined(separator: "\n")
+        
+        return "\(responsePrefix) \(numberToShow):\n\(list)"
     }
 }
