@@ -91,12 +91,14 @@ final class KarmaService: SlackMessageService {
     func messageEvent(slackBot: SlackBot, webApi: WebAPI, message: MessageDecorator, previous: MessageDecorator?) throws {
         guard let target = message.target, self.isKarmaChannel(target) else { return }
         
+        let topKarmaCommand = self.topKarmaCommand(bot: slackBot)
+        
         let response: String
         
-        if message.text.lowercased().hasPrefix(self.topKarmaCommand(bot: slackBot)) { // Top karma users command
+        if message.text.lowercased().hasPrefix(topKarmaCommand) { // Top karma users command
             if
                 let listCountText = message.text
-                    .substring(from: topKarmaCommand(bot: slackBot).endIndex)
+                    .substring(from: topKarmaCommand.endIndex)
                     .components(separatedBy: " ")
                     .first(where: { !$0.isEmpty }),
                 let listCount = Int(listCountText)
