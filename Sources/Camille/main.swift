@@ -12,11 +12,11 @@ let bot = try SlackBot(
     authenticator: OAuthAuthentication.self,
     storage: StorageProvider,
     services: [
-        CrossPostService(config: Configs.CrossPostService),
-        TopicService(config: Configs.TopicService),
+        CrossPostService(config: Configs.CrossPost),
+        TopicService(config: Configs.Topic),
         HelloService(),
-        KarmaService(options: Configs.KarmaService),
-        UserJoinService(config: Configs.UserJoinService)
+        KarmaService(config: Configs.Karma),
+        UserJoinService(config: Configs.UserJoin)
     ]
 )
 

@@ -1,7 +1,7 @@
 import Sugar
 
 extension Configs {
-    static let TopicService = TopicServiceConfig(
+    static let Topic = TopicServiceConfig(
         userAllowed: { user in
             return user.is_admin
         },
