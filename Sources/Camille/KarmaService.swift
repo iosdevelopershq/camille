@@ -97,7 +97,7 @@ final class KarmaService: SlackMessageService {
             if
                 let listCountText = message.text
                     .substring(from: topKarmaCommand(bot: slackBot).characters.count)
-                    .components(separatedBy: " ").filter({ $0.characters.count != 0 }).first,
+                    .components(separatedBy: " ").filter({ !$0.isEmpty }).first,
                 let listCount = Int(listCountText)
             {
                 response = topKarma(maxList: listCount, in: slackBot.storage)
