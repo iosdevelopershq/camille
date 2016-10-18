@@ -91,13 +91,17 @@ final class KarmaService: SlackMessageService {
     func messageEvent(slackBot: SlackBot, webApi: WebAPI, message: MessageDecorator, previous: MessageDecorator?) throws {
         guard let target = message.target, self.isKarmaChannel(target) else { return }
         
+        let isDirectMessage = message.message.channel?.value.instantMessage != nil
+        let topKarmaCommand = self.topKarmaCommand(bot: slackBot, isDirectMessage: isDirectMessage)
+        
         let response: String
         
-        if (message.text.lowercased().hasPrefix(self.topKarmaCommand(bot: slackBot))) { // Top karma users command
+        if message.text.lowercased().hasPrefix(topKarmaCommand) { // Top karma users command
             if
                 let listCountText = message.text
-                    .substring(from: topKarmaCommand(bot: slackBot).characters.count)
-                    .components(separatedBy: " ").filter({ $0.characters.count != 0 }).first,
+                    .substring(from: topKarmaCommand.endIndex)
+                    .components(separatedBy: " ")
+                    .first(where: { !$0.isEmpty }),
                 let listCount = Int(listCountText)
             {
                 response = topKarma(maxList: listCount, in: slackBot.storage)
@@ -181,8 +185,8 @@ final class KarmaService: SlackMessageService {
         guard let targets = self.options.targets else { return true }
         return targets.contains { $0 == target.name || $0 == "*" }
     }
-    private func topKarmaCommand(bot: SlackBot) -> String {
-        return "<@\(bot.me.id)> top".lowercased()
+    private func topKarmaCommand(bot: SlackBot, isDirectMessage: Bool = false) -> String {
+        return isDirectMessage ? "top" : "<@\(bot.me.id.lowercased())> top"
     }
     private func topKarma(maxList: Int, in storage: Storage) -> String {
         guard maxList > 0 else { return "Top \(maxList)? You must work in QA." }
