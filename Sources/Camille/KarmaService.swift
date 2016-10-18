@@ -93,7 +93,7 @@ final class KarmaService: SlackMessageService {
         
         let response: String
         
-        if (message.text.lowercased().hasPrefix(self.topKarmaCommand(bot: slackBot))) { // Top karma users command
+        if message.text.lowercased().hasPrefix(self.topKarmaCommand(bot: slackBot)) { // Top karma users command
             if
                 let listCountText = message.text
                     .substring(from: topKarmaCommand(bot: slackBot).characters.count)
