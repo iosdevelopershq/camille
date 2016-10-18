@@ -1,7 +1,7 @@
 import Sugar
 
 extension Configs {
-    static let CrossPostService = CrossPostServiceConfig(
+    static let CrossPost = CrossPostServiceConfig(
         timeSpan: 60 * 2,
         reportingTarget: "admins",
         publicWarning: { channel, user in
