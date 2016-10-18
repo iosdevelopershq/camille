@@ -181,8 +181,8 @@ final class KarmaService: SlackMessageService {
         guard let targets = self.options.targets else { return true }
         return targets.contains { $0 == target.name || $0 == "*" }
     }
-    private func topKarmaCommand(bot: SlackBot) -> String {
-        return "<@\(bot.me.id)> top".lowercased()
+    private func topKarmaCommand(bot: SlackBot, isDirectMessage: Bool = false) -> String {
+        return isDirectMessage ? "top" : "<@\(bot.me.id.lowercased())> top"
     }
     private func topKarma(maxList: Int, in storage: Storage) -> String {
         guard maxList > 0 else { return "Top \(maxList)? You must work in QA." }
