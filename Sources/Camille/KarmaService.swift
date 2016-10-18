@@ -91,7 +91,8 @@ final class KarmaService: SlackMessageService {
     func messageEvent(slackBot: SlackBot, webApi: WebAPI, message: MessageDecorator, previous: MessageDecorator?) throws {
         guard let target = message.target, self.isKarmaChannel(target) else { return }
         
-        let topKarmaCommand = self.topKarmaCommand(bot: slackBot)
+        let isDirectMessage = message.message.channel?.value.instantMessage != nil
+        let topKarmaCommand = self.topKarmaCommand(bot: slackBot, isDirectMessage: isDirectMessage)
         
         let response: String
         
