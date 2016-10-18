@@ -185,33 +185,35 @@ final class KarmaService: SlackMessageService {
         return "<@\(bot.me.id)> top".lowercased()
     }
     private func topKarma(maxList: Int, in storage: Storage) -> String {
-        guard maxList != 0 else {
-            return "Top 0? You must work in QA."
+        guard maxList > 0 else { return "Top \(maxList)? You must work in QA." }
+        
+        func karma(for user: String) -> Int {
+            return storage.get(in: .in("Karma"), key: user, or: 0)
         }
         
-        func karmaForUser(_ user: String) -> Int {
-            return storage.get(Int.self, in: .in("Karma"), key: user, or: 0)
-        }
         let users = storage.allKeys(.in("Karma"))
-        let sortedUsersAndKarma = users
-            .map { ($0, karmaForUser($0)) }
-            .sorted(by: { $0.1 > $1.1 })
+            .map { (name: $0, karma: karma(for: $0)) }
+            .sorted(by: { $0.karma > $1.karma })
             
         let responsePrefix: String
         let numberToShow: Int
-        if (maxList > 20) {
-            numberToShow = maxList > sortedUsersAndKarma.count ? sortedUsersAndKarma.count : 20
-            responsePrefix = "Yeah, that's too many. Here's the top \(numberToShow):"
-        } else if (maxList > sortedUsersAndKarma.count) {
-            numberToShow = sortedUsersAndKarma.count
-            responsePrefix = "We only have \(numberToShow):"
+        
+        if maxList > 20 {
+            numberToShow = max(users.count, 20)
+            responsePrefix = "Yeah, that's too many. Here's the top"
+        } else if maxList > users.count {
+            numberToShow = users.count
+            responsePrefix = "We only have"
         } else {
             numberToShow = maxList
-            responsePrefix = "Top \(numberToShow):"
+            responsePrefix = "Top"
         }
         
-        return sortedUsersAndKarma.prefix(numberToShow).reduce(responsePrefix, { (partialResponse, userAndKarma) in
-            partialResponse + "\n<@\(userAndKarma.0)>: \(userAndKarma.1)"
-        })
+        let list = users
+            .prefix(numberToShow)
+            .map { user in "<@\(user.name)>: \(user.karma)" }
+            .joined(separator: "\n")
+        
+        return "\(responsePrefix) \(numberToShow):\n\(list)"
     }
 }
