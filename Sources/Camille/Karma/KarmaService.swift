@@ -14,11 +14,22 @@ class KarmaService: SlackMessageService {
     func messageEvent(slackBot: SlackBot, webApi: WebAPI, message: MessageDecorator, previous: MessageDecorator?) throws {
         guard let sender = message.sender, let target = message.target else { return }
         
+        let isDirectMessage = message.message.channel?.value.instantMessage != nil
+        
         //Top Users
-        try message.routeText(
-            to: self.showTopUsers(from: slackBot.storage, in: target, with: webApi, users: slackBot.currentSlackModelData().users),
-            matching: slackBot.me, String.any, "top", Int.any(name: "count")
-        )
+        let showTopUsers = self.showTopUsers(from: slackBot.storage, in: target, with: webApi, users: slackBot.currentSlackModelData().users)
+        
+        if isDirectMessage {
+            try message.routeText(
+                to: showTopUsers,
+                matching: String.any, "top", Int.any(name: "count")
+            )
+        } else {
+            try message.routeText(
+                to: showTopUsers,
+                matching: slackBot.me, String.any, "top", Int.any(name: "count")
+            )
+        }
         
         //Users Karma
         try message.routeText(
