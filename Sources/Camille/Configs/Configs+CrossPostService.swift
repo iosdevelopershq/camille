@@ -3,6 +3,9 @@ import Sugar
 extension Configs {
     static let CrossPostService = CrossPostServiceConfig(
         timeSpan: 60 * 2,
+        includeMessage: { message in
+            return message.text.components(separatedBy: " ").count > 5
+        },
         reportingTarget: "admins",
         publicWarning: { channel, user in
             return try SlackMessage()

@@ -37,8 +37,9 @@ final class CrossPostService: SlackMessageService, SlackInteractiveButtonRespond
         }
     }
     func messageEvent(slackBot: SlackBot, webApi: WebAPI, message: MessageDecorator, previous: MessageDecorator?) throws {
-         //only add new messages and ones that meet the requirements
+        //only add new _channel_ messages and ones that meet the requirements
         guard
+            message.target?.channel != nil,
             previous == nil,
             self.config.includeMessage(message)
             else { return }
