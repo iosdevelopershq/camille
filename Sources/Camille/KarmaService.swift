@@ -111,6 +111,7 @@ final class KarmaService: SlackMessageService {
         } else { // No command found, try to find karma action
             response = message
                 .mentioned_users
+                .map { $0.value }
                 .flatMap { (user: User) -> (User, KarmaAction)? in
                     guard let karma = self.karma(for: user, from: message) else { return nil }
                     return (user, karma)
