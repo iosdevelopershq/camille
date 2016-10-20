@@ -17,28 +17,33 @@ class KarmaService: SlackMessageService {
         let isDirectMessage = message.message.channel?.value.instantMessage != nil
         
         //Top Users
-        let showTopUsers = self.showTopUsers(from: slackBot.storage, in: target, with: webApi, users: slackBot.currentSlackModelData().users)
-        
-        if isDirectMessage {
-            try message.routeText(
-                to: showTopUsers,
-                matching: String.any, "top", Int.any(name: "count")
-            )
-        } else {
-            try message.routeText(
-                to: showTopUsers,
-                matching: slackBot.me, String.any, "top", Int.any(name: "count")
-            )
-        }
+        let topUserPattern = (isDirectMessage
+            ? [String.any, "top", Int.any(name: "count")]
+            : [slackBot.me, String.any, "top", Int.any(name: "count")]
+        )
+        try message.routeText(
+            to: self.showTopUsers(
+                from: slackBot.storage,
+                in: target,
+                with: webApi,
+                users: slackBot.currentSlackModelData().users
+            ),
+            matching: topUserPattern
+        )
         
         //Users Karma
+        let userKarmaPattern: [PartialPatternMatcher] = (isDirectMessage
+            ? ["how much karma do i have"]
+            : [slackBot.me, "how much karma do i have"]
+        )
         try message.routeText(
             to: self.showUserKarma(user: sender, from: slackBot.storage, in: target, with: webApi),
             allowingRemainder: true,
-            matching: slackBot.me, "how much karma do i have"
+            matching: userKarmaPattern
         )
         
         //Karma Action
+        guard !isDirectMessage else { return }
         try self.adjustKarma(in: message, from: sender, in: target, storage: slackBot.storage, webApi: webApi)
     }
 }
