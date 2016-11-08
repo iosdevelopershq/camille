@@ -17,6 +17,7 @@ class KarmaService: SlackMessageService {
         let isDirectMessage = message.message.channel?.value.instantMessage != nil
         
         //Top Users
+        /*
         let topUserPattern = (isDirectMessage
             ? [String.any, "top", Int.any(name: "count")]
             : [slackBot.me, String.any, "top", Int.any(name: "count")]
@@ -30,6 +31,7 @@ class KarmaService: SlackMessageService {
             ),
             matching: topUserPattern
         )
+        */
         
         //Users Karma
         let userKarmaPattern: [PartialPatternMatcher] = (isDirectMessage
