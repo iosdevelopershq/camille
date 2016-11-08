@@ -9,8 +9,8 @@ let package = Package(
         )
     ],
     dependencies: [
-        .Package(url: "https://github.com/ChameleonBot/Bot.git", majorVersion: 0, minor: 1),
-        .Package(url: "https://github.com/ChameleonBot/Sugar.git", majorVersion: 0, minor: 1)
+        .Package(url: "https://github.com/ChameleonBot/Bot.git", majorVersion: 0, minor: 2),
+        .Package(url: "https://github.com/ChameleonBot/Sugar.git", majorVersion: 0, minor: 2)
     ],
     exclude: [
         "XcodeProject"
