@@ -14,7 +14,7 @@ class KarmaService: SlackMessageService {
     func messageEvent(slackBot: SlackBot, webApi: WebAPI, message: MessageDecorator, previous: MessageDecorator?) throws {
         guard let sender = message.sender, let target = message.target else { return }
         
-        let isDirectMessage = message.message.channel?.value.instantMessage != nil
+        let isDirectMessage = message.message.channel?.instantMessage != nil
         
         //Top Users
         /*

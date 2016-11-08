@@ -51,7 +51,7 @@ fileprivate extension TopicService {
             subtype == .channel_topic,
             let topic = message.topic,
             let user = message.user,
-            let channel = message.channel?.value.channel
+            let channel = message.channel?.channel
             else { return }
         
         if (self.config.userAllowed(user)) {
