@@ -7,10 +7,10 @@ extension Configs {
         textDistanceThreshold: 4,
         allowedBufferCharacters: [" ", ":"],
         positiveMessage: { user, total in
-            return ["\(user.name) you rock! - \(total)"]
+            return ["\(user.name) you rock!: \(total)"]
         },
         negativeMessage: { user, total in
-            return ["Boooo \(user.name)! - \(total)"]
+            return ["Boooo \(user.name)!: \(total)"]
         }
     )
 }
