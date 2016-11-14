@@ -15,7 +15,7 @@ let bot = try SlackBot(
         //CrossPostService(config: Configs.CrossPost),
         //TopicService(config: Configs.Topic),
         HelloService(),
-        //KarmaService(config: Configs.Karma),
+        KarmaService(config: Configs.Karma),
         //UserJoinService(config: Configs.UserJoin)
     ]
 )
