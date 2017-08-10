@@ -9,7 +9,7 @@ let StorageProvider = PlistStorage.self
 
 let bot = try SlackBot(
     configDataSource: DefaultConfigDataSource,
-    authenticator: OAuthAuthentication.self,
+    authenticator: TokenAuthentication.self,
     storage: StorageProvider,
     services: [
         //CrossPostService(config: Configs.CrossPost),
