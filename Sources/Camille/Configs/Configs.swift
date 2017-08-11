@@ -1,2 +1,2 @@
-
-enum Configs { }
+//
+//enum Configs { }
