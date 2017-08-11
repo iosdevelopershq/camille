@@ -1,51 +1,52 @@
-import Bot
-import Sugar
+import Chameleon
 
 extension KarmaService {
-    func showTopUsers(
-        from storage: Storage, in target: SlackTargetType, with webApi: WebAPI,
-        users: @autoclosure @escaping () -> [User]) -> (PatternMatchResult) throws -> Void {
-        
-        return { match in
-            let count: Int = match.value(named: "count")
-            
-            guard count > 0 else {
-                let message = SlackMessage().line("Top ", count, "? You must work in QA.")
-                return try webApi.execute(message.makeChatPostMessage(target: target))
-            }
-            
-            func karmaFor(user: User) -> Int {
-                return storage.get(.in("Karma"), key: user.id, or: 0)
-            }
-            
-            let karmaUsers = storage.allKeys(.in("Karma"))
-                .flatMap { id in users().filter({ $0.id == id }) }
-                .map { (user: $0, karma: karmaFor(user: $0)) }
-                .sorted { $0.karma > $1.karma }
-            
-            let actualCount: Int
-            let prefixText: String
-            
-            if count > self.config.topUsersLimit {
-                actualCount = max(karmaUsers.count, self.config.topUsersLimit)
-                prefixText = "Yeah, that's too many. Here's the top "
-                
-            } else if count > karmaUsers.count {
-                actualCount = karmaUsers.count
-                prefixText = "We only have "
-                
-            } else {
-                actualCount = count
-                prefixText = "Top "
-            }
-            
-            let message = SlackMessage()
-                .line(prefixText, actualCount, ":")
-                .lines(for: karmaUsers) { message, entry in
-                    return message.line(entry.user.name.bold, ": ", entry.karma)
-            }
-            
-            try webApi.execute(message.makeChatPostMessage(target: target))
+    func topUsers(bot: SlackBot, message: MessageDecorator, match: PatternMatch) throws {
+        let count: Int = try match.value(key: Keys.count)
+
+        guard count > 0 else {
+            let response = try message
+                .respond()
+                .text(["Top", count, "? You must work in QA."])
+                .makeChatMessage()
+
+            return try bot.send(response)
         }
+
+        let leaderboard = try storage
+            .keys(in: Keys.namespace)
+            .map { userId in
+                return (ModelPointer<User>(id: userId), try storage.get(key: userId, from: Keys.namespace, or: 0))
+            }
+            .sorted(by: { $0.1 > $1.1 })
+
+        guard leaderboard.count > 0 else {
+            let response = try message
+                .respond()
+                .text(["No one has any karma yet."])
+                .makeChatMessage()
+
+            return try bot.send(response)
+        }
+
+        let prefix: String
+        if count > config.topUserLimit { prefix = "Yeah, that's too many. Here's the top" }
+        else if leaderboard.count < count { prefix = "We only have" }
+        else { prefix = "Top" }
+
+        let actualCount = min(leaderboard.count, config.topUserLimit)
+
+        let response = try message
+            .respond()
+            .text([prefix, actualCount])
+            .newLine()
+
+        for (position, entry) in leaderboard.prefix(actualCount).enumerated() {
+            try response
+                .text(["\(position + 1))", entry.0.value().bold, ": ", entry.1])
+                .newLine()
+        }
+        
+        try bot.send(response.makeChatMessage())
     }
 }
