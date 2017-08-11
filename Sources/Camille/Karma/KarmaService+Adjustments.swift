@@ -1,74 +1,71 @@
-import Bot
-import Sugar
+import Chameleon
+import Foundation
+
+private typealias PartialUpdate = (user: ModelPointer<User>, operation: Operation)
+private typealias Update = (ModelPointer<User>, (current: Int, change: Int))
+
+private enum Operation: String {
+    case plus = "++"
+    case minus = "--"
+
+    func update(value: Int) -> Int {
+        switch self {
+        case .plus: return value + 1
+        case .minus: return value - 1
+        }
+    }
+}
 
 extension KarmaService {
-    func adjustKarma(
-        in message: MessageDecorator,
-        from sender: User,
-        in target: SlackTargetType,
-        storage: Storage,
-        webApi: WebAPI) throws -> Void {
-        
-        //find any karma adjustments
-        let adjustments: [(user: User, amount: Int)] = message.mentioned_users.flatMap { link in
-            //user can't adjust their own karma
-            guard link.value != sender else { return nil }
-            
-            //Move past the `>` and get the rest of the message
-            let start = message.text.index(after: link.range.upperBound)
-            let text = message.text.substring(from: start)
-            
-            //iterate forward until we pass the threshold or hit the end of the string
-            for index in (0..<min(self.config.textDistanceThreshold, text.characters.count)) {
-                //check for adjustments
-                for adjuster in self.config.karmaAdjusters {
-                    if text.substring(from: index).hasPrefix(adjuster.adjuster.karmaValue) {
-                        return (link.value, adjuster.amount)
-                    }
-                }
-                
-                //check the allowed chars
-                let nextChar = Character(text.substring(to: 1))
-                guard self.config.allowedBufferCharacters.contains(nextChar) else { break }
-            }
-            
-            return nil
+    func adjust(bot: SlackBot, message: MessageDecorator) throws {
+        guard !message.isIM else { return }
+
+        func partialUpdate(from link: MessageDecorator.Link<ModelPointer<User>>) throws -> PartialUpdate? {
+            guard try link.value.id != message.sender().id else { return nil }
+
+            let possibleOperation = message.text
+                .substring(from: link.range.upperBound)
+                .trimCharacters(in: [" ", ">", ":"])
+                .components(separatedBy: " ")
+                .first ?? ""
+
+            guard let operation = Operation(rawValue: possibleOperation)
+                else { return nil }
+
+            return (link.value, operation)
+        }
+
+        func consolidatePartialUpdates(for user: ModelPointer<User>, partials: [PartialUpdate]) throws -> Update {
+            let count: Int = try storage.get(key: user.id, from: Keys.namespace, or: 0)
+            let change = partials.reduce(0) { $1.operation.update(value: $0) }
+            return (user, (count, change))
+        }
+
+        let updates = try message
+            .mentionedUsers
+            .flatMap(partialUpdate)
+            .group(by: { $0.user })
+            .map(consolidatePartialUpdates)
+            .filter { $0.value.change != 0 }
+
+        guard !updates.isEmpty else { return }
+
+        let response = try message.respond()
+
+        for (user, data) in updates {
+            let newTotal = data.current + data.change
+            storage.set(value: newTotal, forKey: user.id, in: Keys.namespace)
+
+            let comment = (data.change > 0
+                ? config.positiveComments.randomElement
+                : config.negativeComments.randomElement
+            ) ?? ""
+
+            response
+                .text([user, comment, newTotal])
+                .newLine()
         }
         
-        guard !adjustments.isEmpty else { return }
-        
-        //consolidate adjustments
-        let consolidated: [(user: User, change: Int, total: Int)] = adjustments
-            .grouped(by: { $0.user })
-            .flatMap { user, changes in
-                let current: Int = storage.get(.in("Karma"), key: user.id, or: 0)
-                let change = changes.reduce(0) { $0 + $1.amount }
-                guard change != 0 else { return nil }
-                let newTotal = current + change
-                return (user, change, newTotal)
-        }
-        
-        //make adjustments
-        for adjustment in consolidated where adjustment.change != 0 {
-            try storage.set(.in("Karma"), key: adjustment.user.id, value: adjustment.total)
-        }
-        
-        //build a message
-        let response = consolidated
-            .flatMap { adjustment in
-                if adjustment.change > 0 {
-                    return self.config.positiveMessage(adjustment.user, adjustment.total).randomElement
-                } else if adjustment.change < 0 {
-                    return self.config.negativeMessage(adjustment.user, adjustment.total).randomElement
-                }
-                return nil
-            }
-            .joined(separator: "\n")
-        
-        guard !response.isEmpty else { return }
-        
-        //respond
-        let request = ChatPostMessage(target: target, text: response)
-        try webApi.execute(request)
+        try bot.send(response.makeChatMessage())
     }
 }

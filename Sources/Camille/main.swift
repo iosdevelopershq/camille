@@ -1,23 +1,33 @@
-import Bot
-import Sugar
+import Chameleon
 
-#if os(Linux)
-let StorageProvider = RedisStorage.self
-#else
-let StorageProvider = PlistStorage.self
-#endif
+let env = Environment()
+let scopes: String = try env.get(forKey: "SCOPES")
+let auth = OAuthAuthenticator(
+    network: NetworkProvider(),
+    clientId: try env.get(forKey: "CLIENT_ID"),
+    clientSecret: try env.get(forKey: "CLIENT_SECRET"),
+    scopes: Set(scopes.components(separatedBy: ",").flatMap(WebAPI.Scope.init))
+)
+let keyValueStore = RedisKeyValueStore(url: try env.get(forKey: "STORAGE_URL"))
+let storage = RedisStorage(url: try env.get(forKey: "STORAGE_URL"))
 
-let bot = try SlackBot(
-    configDataSource: DefaultConfigDataSource,
-    authenticator: OAuthAuthentication.self,
-    storage: StorageProvider,
+let bot = SlackBot(
+    authenticator: auth,
     services: [
-        //CrossPostService(config: Configs.CrossPost),
-        //TopicService(config: Configs.Topic),
+        SlackBotHelpService(),
+        SlackBotErrorService(store: keyValueStore),
         HelloService(),
-        KarmaService(config: Configs.Karma),
-        //UserJoinService(config: Configs.UserJoin)
+        KarmaService(storage: storage)
     ]
 )
+
+func debug(_ message: String) {
+    let chatMessage = ChatMessage(
+        channel: "U04UAVAEB", // @iankeen
+        text: message
+    )
+
+    try? bot.send(chatMessage)
+}
 
 bot.start()

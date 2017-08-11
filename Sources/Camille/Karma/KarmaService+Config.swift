@@ -1,13 +1,22 @@
-import Sugar
-import Models
 
 extension KarmaService {
-    struct Config {
-        let topUsersLimit: Int
-        let karmaAdjusters: [(adjuster: KarmaAdjustable, amount: Int)]
-        let textDistanceThreshold: Int
-        let allowedBufferCharacters: Set<Character>
-        let positiveMessage: (_ user: User, _ total: Int) -> [String]
-        let negativeMessage: (_ user: User, _ total: Int) -> [String]
+    public struct Config {
+        let topUserLimit: Int
+        let positiveComments: [String]
+        let negativeComments: [String]
+
+        public init(topUserLimit: Int, positiveComments: [String], negativeComments: [String]) {
+            self.topUserLimit = topUserLimit
+            self.positiveComments = positiveComments
+            self.negativeComments = negativeComments
+        }
+
+        public static func `default`() -> Config {
+            return Config(
+                topUserLimit: 10,
+                positiveComments: ["you rock!"],
+                negativeComments: ["booooo!"]
+            )
+        }
     }
 }

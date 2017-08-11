@@ -1,25 +1,38 @@
-import Bot
-import Sugar
+import Chameleon
 
-final class HelloService: SlackMessageService {
-    func messageEvent(slackBot: SlackBot, webApi: WebAPI, message: MessageDecorator, previous: MessageDecorator?) throws {
-        guard let target = message.target, let sender = message.sender else { return }
-        
-        try message.routeText(
-            to: self.sayHello(to: sender, in: target, with: webApi),
-            matching: Greeting(name: "greeting"), slackBot.me
-        )
+final class HelloService: SlackBotMessageService {
+    func configure(slackBot: SlackBot) {
+        configureMessageService(slackBot: slackBot)
+
+        slackBot.registerHelp(item: Patterns.greeting(slackBot))
+    }
+    func onMessage(slackBot: SlackBot, message: MessageDecorator, previous: MessageDecorator?) throws {
+        try slackBot.route(message, matching: Patterns.greeting(slackBot), to: sendGreeting)
+    }
+
+    private func sendGreeting(bot: SlackBot, message: MessageDecorator, match: PatternMatch) throws -> Void {
+        let response = try message
+            .respond()
+            .text(["well", try match.value(key: "greeting"), "back at you", try message.sender()])
+            .makeChatMessage()
+
+        try bot.send(response)
     }
 }
 
-fileprivate extension HelloService {
-    func sayHello(to sender: User, in target: SlackTargetType, with webApi: WebAPI) -> (PatternMatchResult) throws -> Void {
-        return { match in
-            let message = try SlackMessage()
-                .line(match.value(named: "greeting"), " ", sender)
-                .makeChatPostMessage(target: target)
-            
-            try webApi.execute(message)
+private enum Patterns: HelpRepresentable {
+    case greeting(SlackBot)
+
+    var topic: String {
+        return "Greetings"
+    }
+    var description: String {
+        return "Greet the bot"
+    }
+
+    var pattern: [Matcher] {
+        switch self {
+        case .greeting(let bot): return [["hey", "hi", "hello"].any.using(key: "greeting"), bot.me]
         }
     }
 }

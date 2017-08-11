@@ -1,51 +1,41 @@
-import Bot
-import Sugar
+import Chameleon
 
-class KarmaService: SlackMessageService {
-    //MARK: - Properties
+final class KarmaService: SlackBotMessageService {
+    // MARK: - Properties
+    let storage: Storage
     let config: Config
-    
-    //MARK: - Lifecycle
-    init(config: Config) {
+
+    enum Keys {
+        static let namespace = "Karma"
+        static let count = "count"
+        static let user = "user"
+    }
+
+    // MARK: - Lifecycle
+    init(config: Config = Config.default(), storage: Storage) {
         self.config = config
+        self.storage = storage
     }
-    
-    //MARK: - Routing
-    func messageEvent(slackBot: SlackBot, webApi: WebAPI, message: MessageDecorator, previous: MessageDecorator?) throws {
-        guard let sender = message.sender, let target = message.target else { return }
-        
-        let isDirectMessage = message.message.channel?.instantMessage != nil
-        
-        //Top Users
-        /*
-        let topUserPattern = (isDirectMessage
-            ? [String.any, "top", Int.any(name: "count")]
-            : [slackBot.me, String.any, "top", Int.any(name: "count")]
-        )
-        try message.routeText(
-            to: self.showTopUsers(
-                from: slackBot.storage,
-                in: target,
-                with: webApi,
-                users: slackBot.currentSlackModelData().users
-            ),
-            matching: topUserPattern
-        )
-        */
-        
-        //Users Karma
-        let userKarmaPattern: [PartialPatternMatcher] = (isDirectMessage
-            ? ["how much karma do i have"]
-            : [slackBot.me, "how much karma do i have"]
-        )
-        try message.routeText(
-            to: self.showUserKarma(user: sender, from: slackBot.storage, in: target, with: webApi),
-            allowingRemainder: true,
-            matching: userKarmaPattern
-        )
-        
-        //Karma Action
-        guard !isDirectMessage else { return }
-        try self.adjustKarma(in: message, from: sender, in: target, storage: slackBot.storage, webApi: webApi)
+
+    // MARK: - Public Functions
+    func configure(slackBot: SlackBot) {
+        configureMessageService(slackBot: slackBot)
+
+        slackBot
+            .registerHelp(item: Patterns.topUsers)
+            .registerHelp(item: Patterns.myCount)
+            .registerHelp(item: Patterns.userCount)
+            .registerHelp(item: Patterns.adjustment)
     }
+    func onMessage(slackBot: SlackBot, message: MessageDecorator, previous: MessageDecorator?) throws {
+        try slackBot
+            .route(message, matching: Patterns.topUsers, to: topUsers)
+            .route(message, matching: Patterns.myCount, to: senderCount)
+            .route(message, matching: Patterns.userCount, to: userCount)
+            .route(message, matching: Patterns.adjustment, to: noop)
+
+        try adjust(bot: slackBot, message: message)
+    }
+
+    private func noop(bot: SlackBot, message: MessageDecorator, match: PatternMatch) throws { }
 }

@@ -1,20 +1,31 @@
-import Bot
-import Sugar
+import Chameleon
 
 extension KarmaService {
-    func showUserKarma(user: User, from storage: Storage, in target: SlackTargetType,
-                       with webApi: WebAPI) -> (PatternMatchResult) throws -> Void {
-        
-        return { match in
-            let count: Int = storage.get(.in("Karma"), key: user.id, or: 0)
-            
-            let message = SlackMessage()
-                .line(count == 0
-                    ? ["It doesn't look like you have any karma yet ", user, ". Helping people out is a great way to get some!"]
-                    : ["You have ", count, " karma ", user]
+    func userCount(bot: SlackBot, message: MessageDecorator, match: PatternMatch) throws {
+        let user: ModelPointer<User> = try match.value(key: Keys.user)
+
+        let count = try storage.get(key: user.id, from: Keys.namespace, or: 0)
+
+        let response = try message
+            .respond()
+            .text(count == 0
+                ? ["It doesn't look like", user, "has any karma yet"]
+                : [user, "has", count, "karma"]
             )
-            
-            try webApi.execute(message.makeChatPostMessage(target: target))
-        }
+
+        try bot.send(response.makeChatMessage())
+    }
+
+    func senderCount(bot: SlackBot, message: MessageDecorator, match: PatternMatch) throws {
+        let count = try storage.get(key: message.sender().id, from: Keys.namespace, or: 0)
+
+        let response = try message
+            .respond()
+            .text(count == 0
+                ? ["It doesn't look like you have any karma yet"]
+                : ["You have", count, "karma"]
+        )
+
+        try bot.send(response.makeChatMessage())
     }
 }
