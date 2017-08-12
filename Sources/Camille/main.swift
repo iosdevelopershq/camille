@@ -16,6 +16,7 @@ let bot = SlackBot(
     services: [
         SlackBotHelpService(),
         SlackBotErrorService(store: keyValueStore),
+        SlackBotConnectionService(store: keyValueStore),
         HelloService(),
         KarmaService(storage: storage)
     ]
