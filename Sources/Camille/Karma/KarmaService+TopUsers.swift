@@ -34,7 +34,7 @@ extension KarmaService {
         else if leaderboard.count < count { prefix = "We only have" }
         else { prefix = "Top" }
 
-        let actualCount = min(leaderboard.count, config.topUserLimit)
+        let actualCount = min(count, config.topUserLimit)
 
         let response = try message
             .respond()
