@@ -24,7 +24,7 @@ extension KarmaService {
             case .topUsers: return ["top", Int.any.using(key: Keys.count)]
             case .myCount: return ["how much karma do I have"]
             case .userCount: return ["how much karma does", User.any.using(key: Keys.user), "have"]
-            case .adjustment: return [User.any, ["++", "--"].any]
+            case .adjustment: return [User.any, Operation.values.any]
             }
         }
 
