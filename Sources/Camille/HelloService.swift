@@ -1,5 +1,7 @@
 import Chameleon
 
+private let greetings = ["heya", "hey", "hi", "hello", "gday", "howdy"]
+
 final class HelloService: SlackBotMessageService {
     func configure(slackBot: SlackBot) {
         configureMessageService(slackBot: slackBot)
@@ -17,6 +19,7 @@ final class HelloService: SlackBotMessageService {
             .makeChatMessage()
 
         try bot.send(response)
+        try bot.react(to: message, with: Emoji.wave)
     }
 }
 
@@ -32,7 +35,7 @@ private enum Patterns: HelpRepresentable {
 
     var pattern: [Matcher] {
         switch self {
-        case .greeting(let bot): return [["hey", "hi", "hello"].any.using(key: "greeting"), bot.me]
+        case .greeting(let bot): return [greetings.any.using(key: "greeting"), bot.me]
         }
     }
 }

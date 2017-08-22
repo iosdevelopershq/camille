@@ -1,15 +1,19 @@
 import Chameleon
 
 let env = Environment()
+
+let keyValueStore = RedisKeyValueStore(url: try env.get(forKey: "STORAGE_URL"))
+let storage = RedisStorage(url: try env.get(forKey: "STORAGE_URL"))
+
 let scopes: String = try env.get(forKey: "SCOPES")
+
 let auth = OAuthAuthenticator(
     network: NetworkProvider(),
+    storage: storage,
     clientId: try env.get(forKey: "CLIENT_ID"),
     clientSecret: try env.get(forKey: "CLIENT_SECRET"),
     scopes: Set(scopes.components(separatedBy: ",").flatMap(WebAPI.Scope.init))
 )
-let keyValueStore = RedisKeyValueStore(url: try env.get(forKey: "STORAGE_URL"))
-let storage = RedisStorage(url: try env.get(forKey: "STORAGE_URL"))
 
 let bot = SlackBot(
     authenticator: auth,
