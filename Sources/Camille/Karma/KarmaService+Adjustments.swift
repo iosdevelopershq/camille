@@ -4,19 +4,34 @@ import Foundation
 private typealias PartialUpdate = (user: ModelPointer<User>, operation: Operation)
 private typealias Update = (ModelPointer<User>, (current: Int, change: Int))
 
-private enum Operation: String {
-    case plus = "++"
-    case minus = "--"
-
-    func update(value: Int) -> Int {
-        switch self {
-        case .plus: return value + 1
-        case .minus: return value - 1
+extension KarmaService {
+    enum Operation {
+        case plus
+        case minus
+        
+        static let minusValues = ["--", "-=1", "-= 1"]
+        static let plusValues = ["++", "+=1", "+= 1"]
+        static let values = Operation.minusValues + Operation.plusValues
+        
+        init?(rawValue: String) {
+            switch rawValue {
+            case _ where Operation.plusValues.contains(rawValue):
+                self = .plus
+            case _ where Operation.minusValues.contains(rawValue):
+                self = .minus
+            default:
+                return nil
+            }
+        }
+        
+        func update(value: Int) -> Int {
+            switch self {
+            case .plus: return value + 1
+            case .minus: return value - 1
+            }
         }
     }
-}
-
-extension KarmaService {
+    
     func adjust(bot: SlackBot, message: MessageDecorator) throws {
         guard !message.isIM else { return }
 
