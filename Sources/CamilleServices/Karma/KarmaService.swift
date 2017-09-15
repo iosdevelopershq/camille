@@ -1,6 +1,6 @@
 import Chameleon
 
-final class KarmaService: SlackBotMessageService {
+public final class KarmaService: SlackBotMessageService {
     // MARK: - Properties
     let storage: Storage
     let config: Config
@@ -12,13 +12,13 @@ final class KarmaService: SlackBotMessageService {
     }
 
     // MARK: - Lifecycle
-    init(config: Config = Config.default(), storage: Storage) {
+    public init(config: Config = Config.default(), storage: Storage) {
         self.config = config
         self.storage = storage
     }
 
     // MARK: - Public Functions
-    func configure(slackBot: SlackBot) {
+    public func configure(slackBot: SlackBot) {
         configureMessageService(slackBot: slackBot)
 
         slackBot
@@ -27,7 +27,7 @@ final class KarmaService: SlackBotMessageService {
             .registerHelp(item: Patterns.userCount)
             .registerHelp(item: Patterns.adjustment)
     }
-    func onMessage(slackBot: SlackBot, message: MessageDecorator, previous: MessageDecorator?) throws {
+    public func onMessage(slackBot: SlackBot, message: MessageDecorator, previous: MessageDecorator?) throws {
         try slackBot
             .route(message, matching: Patterns.topUsers, to: topUsers)
             .route(message, matching: Patterns.myCount, to: senderCount)
