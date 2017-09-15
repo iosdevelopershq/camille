@@ -2,5 +2,5 @@ import XCTest
 @testable import CamilleTests
 
 XCTMain([
-    testCase(CamilleTests.allTests),
+    testCase(KarmaService_AdjustmentsTests.allTests),
 ])
