@@ -20,8 +20,12 @@ class KarmaService_AdjustmentsTests: XCTestCase {
 
                     (ModelIDs.mockUser2, "<@\(ModelIDs.mockUser1)>++", 1),
                     (ModelIDs.mockUser2, "<@\(ModelIDs.mockUser1)> ++", 1),
+                    (ModelIDs.mockUser2, "<@\(ModelIDs.mockUser1)>++\n", 1),
+                    (ModelIDs.mockUser2, "\n<@\(ModelIDs.mockUser1)>++", 1),
 
                     (ModelIDs.mockUser2, "<@\(ModelIDs.mockUser1)>++ <@\(ModelIDs.mockUser1)>++", 2),
+                    (ModelIDs.mockUser2, "<@\(ModelIDs.mockUser1)>++\n<@\(ModelIDs.mockUser1)>++", 2),
+                    (ModelIDs.mockUser2, "\n<@\(ModelIDs.mockUser1)>++\n\n<@\(ModelIDs.mockUser1)>++\n", 2),
                     ]
 
                 for (sender, text, change) in adjustments {

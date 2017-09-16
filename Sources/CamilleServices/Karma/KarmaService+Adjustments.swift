@@ -26,7 +26,7 @@ extension KarmaService {
             let possibleOperation = message.text
                 .substring(from: link.range.upperBound)
                 .trimCharacters(in: [" ", ">", ":"])
-                .components(separatedBy: " ")
+                .components(seperatedBy: [" ", "\n"])
                 .first ?? ""
 
             guard let operation = Operation(rawValue: possibleOperation)
