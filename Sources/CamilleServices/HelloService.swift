@@ -2,13 +2,15 @@ import Chameleon
 
 private let greetings = ["heya", "hey", "hi", "hello", "gday", "howdy"]
 
-final class HelloService: SlackBotMessageService {
-    func configure(slackBot: SlackBot) {
+public final class HelloService: SlackBotMessageService {
+    public init() { }
+
+    public func configure(slackBot: SlackBot) {
         configureMessageService(slackBot: slackBot)
 
         slackBot.registerHelp(item: Patterns.greeting(slackBot))
     }
-    func onMessage(slackBot: SlackBot, message: MessageDecorator, previous: MessageDecorator?) throws {
+    public func onMessage(slackBot: SlackBot, message: MessageDecorator, previous: MessageDecorator?) throws {
         try slackBot.route(message, matching: Patterns.greeting(slackBot), to: sendGreeting)
     }
 
