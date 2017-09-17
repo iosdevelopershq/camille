@@ -49,7 +49,7 @@ public class SwiftService: SlackBotMessageService, HelpRepresentable {
                 response.text([result.stderr.pre])
 
             } else {
-                response.text([result.stdout.pre])
+                response.text([result.stdout.quote])
             }
 
             try bot.send(response.makeChatMessage())
