@@ -1,3 +1,4 @@
+import Foundation
 import Chameleon
 import CamilleServices
 
@@ -23,7 +24,8 @@ let bot = SlackBot(
         SlackBotErrorService(store: keyValueStore),
         SlackBotConnectionService(store: keyValueStore),
         HelloService(),
-        KarmaService(storage: storage)
+        KarmaService(storage: storage),
+        SwiftService(network: NetworkProvider(), token: try env.get(forKey: "GLOT_APIKEY")),
     ]
 )
 
