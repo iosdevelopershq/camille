@@ -5,7 +5,7 @@ struct CodeMatcher: Matcher {
     func match(against input: String) -> Match? {
         guard input.hasPrefix("`") && input.hasSuffix("`") else { return nil }
 
-        let code = input.trim(characters: ["`"])
+        let code = input.trim(characters: ["`"]).stringByDecodingHTMLEntities
 
         guard !code.isEmpty else { return nil }
 
