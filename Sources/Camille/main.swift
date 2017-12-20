@@ -3,18 +3,17 @@ import Chameleon
 import CamilleServices
 
 let env = Environment()
-let dev = try env.get(forKey: "DEVELOPMENT", or: false)
 
 let keyValueStore: KeyValueStore
 let storage: Storage
 
-if dev {
-    keyValueStore = MemoryKeyValueStore()
-    storage = PListStorage()
-} else {
-    keyValueStore = RedisKeyValueStore(url: try env.get(forKey: "STORAGE_URL"))
-    storage = RedisStorage(url: try env.get(forKey: "STORAGE_URL"))
-}
+#if !os(Linux)
+keyValueStore = MemoryKeyValueStore()
+storage = PListStorage()
+#else
+keyValueStore = RedisKeyValueStore(url: try env.get(forKey: "STORAGE_URL"))
+storage = RedisStorage(url: try env.get(forKey: "STORAGE_URL"))
+#endif
 
 let scopes: String = try env.get(forKey: "SCOPES")
 
