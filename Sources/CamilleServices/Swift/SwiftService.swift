@@ -92,8 +92,8 @@ private struct GlotResponse {
     let error: String
 }
 
-extension GlotResponse: Decodable {
-    init(decoder: Decoder) throws {
+extension GlotResponse: Common.Decodable {
+    init(decoder: Common.Decoder) throws {
         self = try decode {
             return GlotResponse(
                 stdout: try decoder.value(at: ["stdout"]),

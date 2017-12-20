@@ -23,8 +23,9 @@ extension KarmaService {
         func partialUpdate(from link: MessageDecorator.Link<ModelPointer<User>>) throws -> PartialUpdate? {
             guard try link.value.id != message.sender().id else { return nil }
 
-            let possibleOperation = message.text
-                .substring(from: link.range.upperBound)
+            let text = String(message.text[link.range.upperBound...])
+
+            let possibleOperation = text
                 .trimCharacters(in: [" ", ">", ":"])
                 .components(seperatedBy: [" ", "\n"])
                 .first ?? ""

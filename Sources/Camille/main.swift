@@ -3,9 +3,18 @@ import Chameleon
 import CamilleServices
 
 let env = Environment()
+let dev = try env.get(forKey: "DEVELOPMENT", or: false)
 
-let keyValueStore = RedisKeyValueStore(url: try env.get(forKey: "STORAGE_URL"))
-let storage = RedisStorage(url: try env.get(forKey: "STORAGE_URL"))
+let keyValueStore: KeyValueStore
+let storage: Storage
+
+if dev {
+    keyValueStore = MemoryKeyValueStore()
+    storage = PListStorage()
+} else {
+    keyValueStore = RedisKeyValueStore(url: try env.get(forKey: "STORAGE_URL"))
+    storage = RedisStorage(url: try env.get(forKey: "STORAGE_URL"))
+}
 
 let scopes: String = try env.get(forKey: "SCOPES")
 
@@ -14,7 +23,8 @@ let auth = OAuthAuthenticator(
     storage: storage,
     clientId: try env.get(forKey: "CLIENT_ID"),
     clientSecret: try env.get(forKey: "CLIENT_SECRET"),
-    scopes: Set(scopes.components(separatedBy: ",").flatMap(WebAPI.Scope.init))
+    scopes: Set(scopes.components(separatedBy: ",").flatMap(WebAPI.Scope.init)),
+    redirectUri: try? env.get(forKey: "REDIRECT_URI")
 )
 
 let bot = SlackBot(

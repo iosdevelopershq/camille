@@ -1,17 +1,19 @@
-// swift-tools-version:3.1
+// swift-tools-version:4.0
 
 import PackageDescription
 
 let package = Package(
     name: "Camille",
-    targets: [
-        Target(name: "CamilleServices"),
-        Target(name: "Camille", dependencies: ["CamilleServices"]),
+    products: [
+        .executable(name: "Camille", targets: ["Camille"]),
+        .library(name: "CamilleServices", targets: ["CamilleServices"]),
     ],
     dependencies: [
-        .Package(url: "https://github.com/ChameleonBot/Chameleon.git", majorVersion: 1),
+        .package(url: "https://github.com/ChameleonBot/Chameleon.git", .upToNextMinor(from: "0.0.0")),
     ],
-    exclude: [
-        "XcodeProject"
+    targets: [
+        .target(name: "Camille", dependencies: ["CamilleServices"]),
+        .target(name: "CamilleServices", dependencies: ["Chameleon"]),
+        .testTarget(name: "CamilleTests", dependencies: ["CamilleServices"]),
     ]
 )
