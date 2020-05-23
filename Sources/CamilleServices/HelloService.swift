@@ -1,14 +1,5 @@
 import ChameleonKit
 
-extension Parser {
-    static var never: Parser {
-        return .init { _ in throw ParserError.matchFailed(name: "never", reason: "") }
-    }
-    static func anyOf(_ values: [Parser]) -> Parser {
-        return values.reduce(never, ||)
-    }
-}
-
 extension SlackBot {
     public func enableHello() -> SlackBot {
         listen(for: .message) { bot, message in
