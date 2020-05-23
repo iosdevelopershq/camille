@@ -19,7 +19,7 @@ extension SlackBot.Karma {
 
             let response: MarkdownString = count == 0
                 ? "It doesn’t look like you have any karma yet"
-                : "You have \(count) karma"
+                : "\(user) has \(count) karma"
 
             try bot.perform(.respond(to: message, .inline, with: response))
         }
