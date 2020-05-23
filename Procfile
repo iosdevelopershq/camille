@@ -1,1 +1,1 @@
-web: Camille serve --env production --hostname 0.0.0.0 --port $PORT
+web: Camille serve --hostname 0.0.0.0 --port $PORT
