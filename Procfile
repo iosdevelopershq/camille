@@ -1,1 +1,1 @@
-web: Camille --env=production --port=$PORT
+web: Camille --env production --hostname 0.0.0.0 --port $PORT
