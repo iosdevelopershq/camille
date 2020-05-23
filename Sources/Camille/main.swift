@@ -12,8 +12,9 @@ let storage: Storage
 keyValueStore = MemoryKeyValueStorage()
 storage = PListStorage(name: "camille")
 #else
-keyValueStore = RedisKeyValueStorage(url: try env.get(forKey: "STORAGE_URL"))
-storage = RedisStorage(url: try env.get(forKey: "STORAGE_URL"))
+let storageUrl = URL(string: try env.get(forKey: "STORAGE_URL"))!
+keyValueStore = RedisKeyValueStorage(url: storageUrl)
+storage = RedisStorage(url: storageUrl)
 #endif
 
 let bot = try SlackBot
