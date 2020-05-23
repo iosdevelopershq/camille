@@ -1,43 +1,24 @@
-import Chameleon
+import ChameleonKit
 
-private let greetings = ["heya", "hey", "hi", "hello", "gday", "howdy"]
-
-public final class HelloService: SlackBotMessageService {
-    public init() { }
-
-    public func configure(slackBot: SlackBot) {
-        configureMessageService(slackBot: slackBot)
-
-        slackBot.registerHelp(item: Patterns.greeting(slackBot))
+extension Parser {
+    static var never: Parser {
+        return .init { _ in throw ParserError.matchFailed(name: "never", reason: "") }
     }
-    public func onMessage(slackBot: SlackBot, message: MessageDecorator, previous: MessageDecorator?) throws {
-        try slackBot.route(message, matching: Patterns.greeting(slackBot), to: sendGreeting)
-    }
-
-    private func sendGreeting(bot: SlackBot, message: MessageDecorator, match: PatternMatch) throws -> Void {
-        let response = try message
-            .respond()
-            .text(["well", try match.value(key: "greeting"), "back at you", try message.sender()])
-            .makeChatMessage()
-
-        try bot.send(response)
-        try bot.react(to: message, with: Emoji.wave)
+    static func anyOf(_ values: [Parser]) -> Parser {
+        return values.reduce(never, ||)
     }
 }
 
-private enum Patterns: HelpRepresentable {
-    case greeting(SlackBot)
+extension SlackBot {
+    public func enableHello() -> SlackBot {
+        listen(for: .message) { bot, message in
+            let values: [Parser<String>] = ["heya", "hey", "hi", "hello", "gday", "howdy"]
 
-    var topic: String {
-        return "Greetings"
-    }
-    var description: String {
-        return "Greet the bot"
-    }
-
-    var pattern: [Matcher] {
-        switch self {
-        case .greeting(let bot): return [greetings.any.using(key: "greeting"), bot.me]
+            try message.matching(^.anyOf(values) <* .user(bot.me)^) { greeting in
+                try bot.perform(.respond(to: message, .inline, with: "well \(greeting) back at you \(message.user)"))
+                try bot.perform(.react(to: message, with: .wave))
+            }
         }
+        return self
     }
 }

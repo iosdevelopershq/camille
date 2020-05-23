@@ -1,50 +1,27 @@
 import Foundation
-import Chameleon
 import CamilleServices
+import ChameleonKit
+import VaporProviders
 
 let env = Environment()
 
-let keyValueStore: KeyValueStore
+let keyValueStore: KeyValueStorage
 let storage: Storage
 
 #if !os(Linux)
-keyValueStore = MemoryKeyValueStore()
-storage = PListStorage()
+keyValueStore = MemoryKeyValueStorage()
+storage = PListStorage(name: "camille")
 #else
-keyValueStore = RedisKeyValueStore(url: try env.get(forKey: "STORAGE_URL"))
+keyValueStore = RedisKeyValueStorage(url: try env.get(forKey: "STORAGE_URL"))
 storage = RedisStorage(url: try env.get(forKey: "STORAGE_URL"))
 #endif
 
-let scopes: String = try env.get(forKey: "SCOPES")
-
-let auth = OAuthAuthenticator(
-    network: NetworkProvider(),
-    storage: storage,
-    clientId: try env.get(forKey: "CLIENT_ID"),
-    clientSecret: try env.get(forKey: "CLIENT_SECRET"),
-    scopes: Set(scopes.components(separatedBy: ",").flatMap(WebAPI.Scope.init)),
-    redirectUri: try? env.get(forKey: "REDIRECT_URI")
-)
-
-let bot = SlackBot(
-    authenticator: auth,
-    services: [
-        SlackBotHelpService(),
-        SlackBotErrorService(store: keyValueStore),
-        SlackBotConnectionService(store: keyValueStore),
-        HelloService(),
-        KarmaService(storage: storage),
-        SwiftService(network: NetworkProvider(), token: try env.get(forKey: "GLOT_APIKEY")),
-    ]
-)
-
-func debug(_ message: String) {
-    let chatMessage = ChatMessage(
-        channel: "U04UAVAEB", // @iankeen
-        text: message
+let bot = try SlackBot
+    .vaporBased(
+        verificationToken: try env.get(forKey: "VERIFICATION_TOKEN"),
+        accessToken: try env.get(forKey: "ACCESS_TOKEN")
     )
+    .enableHello()
+    .enableKarma(config: .default(), storage: storage)
 
-    try? bot.send(chatMessage)
-}
-
-bot.start()
+try bot.start()
