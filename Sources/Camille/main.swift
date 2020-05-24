@@ -2,6 +2,7 @@ import Foundation
 import CamilleServices
 import ChameleonKit
 import VaporProviders
+import LegibleError
 
 extension Error {
     var displayDescription: String {
