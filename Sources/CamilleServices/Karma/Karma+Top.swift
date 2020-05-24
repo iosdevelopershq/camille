@@ -8,8 +8,11 @@ extension SlackBot.Karma {
                 return
             }
 
-            let leaderboard = try storage.keys(in: Keys.namespace)
-                .map { (Identifier<User>(rawValue: $0), try storage.get(forKey: $0, from: Keys.namespace) as Int) }
+            let karma = try storage.keys(in: Keys.namespace)
+            let values = try storage.getAll(Int.self, forKeys: karma, from: Keys.namespace)
+
+            let leaderboard = zip(karma, values)
+                .map { (Identifier<User>(rawValue: $0), $1) }
                 .sorted(by: { $0.1 > $1.1 })
 
             guard !leaderboard.isEmpty else {
