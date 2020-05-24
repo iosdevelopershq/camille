@@ -42,7 +42,7 @@ let bot = try SlackBot
 
 bot.listen(for: .error) { bot, error in
     let channel = Identifier<Channel>(rawValue: "#bot-laboratory")
-    try bot.perform(.speak(in: channel, "\("Error: ", .bold) \(error.displayDescription)"))
+    try bot.perform(.speak(in: channel, "\("Error: ", .bold) \(error.legibleLocalizedDescription)"))
 }
 
 try bot.start()

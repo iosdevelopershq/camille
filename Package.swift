@@ -12,9 +12,14 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/ChameleonBot/Chameleon.git", .branch("revamp")),
+        .package(url: "https://github.com/mxcl/LegibleError.git", from: "1.0.0"),
     ],
     targets: [
-        .target(name: "Camille", dependencies: ["CamilleServices", .product(name: "VaporProviders", package: "Chameleon")]),
+        .target(name: "Camille", dependencies: [
+            "CamilleServices",
+            .product(name: "VaporProviders", package: "Chameleon"),
+            .product(name: "LegibleError", package: "LegibleError"),
+        ]),
         .target(name: "CamilleServices", dependencies: [.product(name: "ChameleonKit", package: "Chameleon")]),
     ]
 )
