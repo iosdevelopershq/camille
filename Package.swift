@@ -21,5 +21,9 @@ let package = Package(
             .product(name: "LegibleError", package: "LegibleError"),
         ]),
         .target(name: "CamilleServices", dependencies: [.product(name: "ChameleonKit", package: "Chameleon")]),
+        .testTarget(name: "CamilleTests", dependencies: [
+            "CamilleServices",
+            .product(name: "ChameleonTestKit", package: "Chameleon")
+        ]),
     ]
 )
