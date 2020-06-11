@@ -4,21 +4,6 @@ import ChameleonKit
 import VaporProviders
 import LegibleError
 
-extension Error {
-    var displayDescription: String {
-        switch self {
-        case let error as LocalizedError:
-            return error.localizedDescription
-
-        case let error as CustomNSError:
-            return error.localizedDescription
-
-        default:
-            return (self as NSError).localizedDescription
-        }
-    }
-}
-
 let env = Environment()
 
 let keyValueStore: KeyValueStorage
