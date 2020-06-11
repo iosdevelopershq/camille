@@ -5,15 +5,20 @@ extension SlackBot {
 }
 
 extension SlackBot {
-    public func enableEmailFilter(config: EarlyWarning.Config) -> SlackBot {
-        listen(for: .teamJoin) { bot, user in
-            guard
-                let email = user.profile.email,
-                let domain = email.components(separatedBy: "@").last,
-                config.domains.contains(domain)
-                else { return }
+    public func enableEarlyWarning(config: EarlyWarning.Config) -> SlackBot {
+        listen(for: .teamJoin) { bot, newUser in
+            let user = try bot.lookup(newUser.id)
 
-            try bot.perform(.speak(in: config.channel, "New user \(user) has joined with the email \(email)"))
+            guard let email = user.profile.email, let domain = email.components(separatedBy: "@").last else { return }
+
+            var destination: Identifier<Channel>?
+
+            if config.domains.contains(domain) { destination = config.alertChannel }
+            else { destination = config.emailChannel }
+
+            guard let channel = destination else { return }
+
+            try bot.perform(.speak(in: channel, "New user \(user) has joined with the email \(email)"))
         }
 
         return self

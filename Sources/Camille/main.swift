@@ -25,6 +25,7 @@ let bot = try SlackBot
     )
     .enableHello()
     .enableKarma(config: .default(), storage: storage)
+    .enableEarlyWarning(config: .default())
 
 bot.listen(for: .error) { bot, error in
     let channel = Identifier<Channel>(rawValue: "#bot-laboratory")

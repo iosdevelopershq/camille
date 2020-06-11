@@ -4,13 +4,19 @@ import ChameleonKit
 extension SlackBot.EarlyWarning {
     public struct Config {
         /// Channel to report new users whose email domain that match one of the provided domains
-        public var channel: Identifier<Channel>
+        /// Provide `nil` to not report on this
+        public var alertChannel: Identifier<Channel>?
+
+        /// Channel to report new users whose email domain _doesn't_ match one of the provided domains
+        /// Provide `nil` to not report on this
+        public var emailChannel: Identifier<Channel>?
 
         /// Domains to check new users emails against
         public var domains: Set<String>
 
-        public init(channel: String, domains: Set<String>) {
-            self.channel = .init(rawValue: channel)
+        public init(alertChannel: String?, emailChannel: String?, domains: Set<String>) {
+            self.alertChannel = alertChannel.map(Identifier.init(rawValue:))
+            self.emailChannel = emailChannel.map(Identifier.init(rawValue:))
             self.domains = domains
         }
 
@@ -29,9 +35,11 @@ extension SlackBot.EarlyWarning {
                 "nutpa.net",
                 "p33.org",
                 "vps30.com",
+                "awdrt.com",
+                "ttirv.com",
             ]
 
-            return Config(channel: "admins", domains: Set(blocklist + domains))
+            return .init(alertChannel: "admins", emailChannel: "new-users", domains: Set(blocklist + domains))
         }
     }
 }
