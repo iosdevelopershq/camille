@@ -32,4 +32,42 @@ bot.listen(for: .error) { bot, error in
     try bot.perform(.speak(in: channel, "\("Error: ", .bold) \(error.legibleLocalizedDescription)"))
 }
 
+
+let errorChannel = Identifier<Channel>(rawValue: "G015J4U0SUC")
+
+extension SlackEvent {
+    static var all: SlackEvent<[String: Any]> {
+        return .init(
+            identifier: "any",
+            canHandle: { type, json in
+                switch type {
+                case "message":
+                    return (json["channel"] as? String) != errorChannel.rawValue
+                default:
+                    return true
+                }
+            },
+            handler: { $0 }
+        )
+    }
+}
+
+var dumping = false
+bot.listen(for: .message) { bot, message in
+    guard message.channel == errorChannel else { return }
+
+    try message.matching(^.user(bot.me) && " start") { dumping = true }
+    try message.matching(^.user(bot.me) && " stop") { dumping = false }
+}
+
+bot.listen(for: .all) { (bot, json) in
+    guard dumping else { return }
+    let data = try JSONSerialization.data(withJSONObject: json, options: .prettyPrinted)
+    let string = String(data: data, encoding: .utf8) ?? ""
+
+    guard !string.isEmpty else { return }
+
+    try bot.perform(.speak(in: errorChannel, "\(string)"))
+}
+
 try bot.start()
