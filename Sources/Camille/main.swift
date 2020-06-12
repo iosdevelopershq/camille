@@ -28,7 +28,7 @@ let bot = try SlackBot
     .enableEarlyWarning(config: .default())
 
 bot.listen(for: .error) { bot, error in
-    let channel = Identifier<Channel>(rawValue: "#bot-laboratory")
+    let channel = Identifier<Channel>(rawValue: "#camille_errors")
     try bot.perform(.speak(in: channel, "\("Error: ", .bold) \(error.legibleLocalizedDescription)"))
 }
 
