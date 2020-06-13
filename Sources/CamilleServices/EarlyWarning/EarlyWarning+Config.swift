@@ -37,6 +37,7 @@ extension SlackBot.EarlyWarning {
                 "vps30.com",
                 "awdrt.com",
                 "ttirv.com",
+                "kewrg.com",
             ]
 
             return .init(alertChannel: "admins", emailChannel: "new-users", domains: Set(blocklist + domains))
