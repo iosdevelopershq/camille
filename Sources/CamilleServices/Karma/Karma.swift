@@ -15,6 +15,7 @@ extension SlackBot {
         listen(for: .message) { bot, message in
             guard message.user != bot.me.id else { return }
             guard !(message.subtype == .thread_broadcast && message.hidden) else { return }
+            guard !message.isUnfurl else { return }
 
             try Karma.trySenderStatus(storage, bot, message)
             try Karma.tryUserStatus(storage, bot, message)
