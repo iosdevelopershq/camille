@@ -84,11 +84,8 @@ class KarmaTests: XCTestCase {
         let storage = MemoryStorage()
         _ = test.bot.enableKarma(config: .default(), storage: storage)
 
-        try test.send(
-            .event(.message([
-                .text("Hey "), .user("1"), .text(" have you used C++?")
-            ]))
-        )
+        try test.send(.event(.message([.text("Hey "), .user("1"), .text(" have you used C++?")])))
+        try test.send(.event(.message([.user("1"), .text("haha -- something something")])))
 
         try XCTAssertEqual(storage.keys(in: SlackBot.Karma.Keys.namespace), [])
         XCTAssertClear(test)
