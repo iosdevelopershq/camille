@@ -1,0 +1,96 @@
+{
+  "previous_message" : {
+    "type" : "message",
+    "user" : "U0000000001",
+    "blocks" : [
+      {
+        "elements" : [
+          {
+            "type" : "rich_text_section",
+            "elements" : [
+              {
+                "type" : "link",
+                "url" : "https:\/\/developer.apple.com\/"
+              },
+              {
+                "text" : " ",
+                "type" : "text"
+              },
+              {
+                "user_id" : "U0000000002",
+                "type" : "user"
+              },
+              {
+                "type" : "text",
+                "text" : " ++"
+              }
+            ]
+          }
+        ],
+        "type" : "rich_text",
+        "block_id" : "dyBy"
+      }
+    ],
+    "text" : "<https:\/\/developer.apple.com\/> <@U2CN0E3PW> ++",
+    "ts" : "1593110391.000600",
+    "team" : "T00000000",
+    "client_msg_id" : "cf00e094-d48d-4db2-826e-f3560c46f41a"
+  },
+  "channel_type" : "im",
+  "hidden" : true,
+  "channel" : "D0000000000",
+  "event_ts" : "1593110393.000700",
+  "message" : {
+    "blocks" : [
+      {
+        "elements" : [
+          {
+            "type" : "rich_text_section",
+            "elements" : [
+              {
+                "url" : "https:\/\/developer.apple.com\/",
+                "type" : "link"
+              },
+              {
+                "type" : "text",
+                "text" : " "
+              },
+              {
+                "type" : "user",
+                "user_id" : "U0000000002"
+              },
+              {
+                "type" : "text",
+                "text" : " ++"
+              }
+            ]
+          }
+        ],
+        "type" : "rich_text",
+        "block_id" : "dyBy"
+      }
+    ],
+    "ts" : "1593110391.000600",
+    "type" : "message",
+    "attachments" : [
+      {
+        "service_icon" : "https:\/\/developer.apple.com\/favicon.ico",
+        "id" : 1,
+        "original_url" : "https:\/\/developer.apple.com\/",
+        "title_link" : "https:\/\/developer.apple.com\/",
+        "fallback" : "Apple Developer",
+        "title" : "Apple Developer",
+        "from_url" : "https:\/\/developer.apple.com\/",
+        "service_name" : "developer.apple.com",
+        "text" : "There’s never been a better time to develop for Apple Platforms."
+      }
+    ],
+    "team" : "T00000000",
+    "client_msg_id" : "cf00e094-d48d-4db2-826e-f3560c46f41a",
+    "user" : "U0000000001",
+    "text" : "<https:\/\/developer.apple.com\/> <@U2CN0E3PW> ++"
+  },
+  "ts" : "1593110393.000700",
+  "subtype" : "message_changed",
+  "type" : "message"
+}

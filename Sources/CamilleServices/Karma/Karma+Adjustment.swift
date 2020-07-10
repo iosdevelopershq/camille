@@ -6,10 +6,10 @@ struct KarmaModifier {
 
 extension ElementMatcher {
     static var karma: ElementMatcher {
-        let plusOne = ElementMatcher.contains("++").map(KarmaModifier { $0 + 1 })
+        let plusOne = ElementMatcher(^"++").map(KarmaModifier { $0 + 1 })
         let plusN = ElementMatcher("+=" && optional(.whitespace) *> .integer).map { n in KarmaModifier { $0 + n } }
 
-        let minusOne = ElementMatcher.contains("--").map(KarmaModifier { $0 - 1 })
+        let minusOne = ElementMatcher(^"--").map(KarmaModifier { $0 - 1 })
         let minusN = ElementMatcher("-=" && optional(.whitespace) *> .integer).map { n in KarmaModifier { $0 - n } }
 
         return plusOne || plusN || minusOne || minusN
@@ -30,9 +30,10 @@ extension SlackBot.Karma {
             }
 
             // filter out unwanted results
+            tally[message.user] = 0 // remove any 'self-karma'
             let validUpdates = tally.filter({ $0.value != 0 }).keys
 
-            guard !updates.isEmpty else { return }
+            guard !validUpdates.isEmpty else { return }
 
             // perform updates and build response
             var responses: [MarkdownString] = []

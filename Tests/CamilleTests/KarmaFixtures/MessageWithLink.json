@@ -1,0 +1,39 @@
+{
+  "user" : "U0000000001",
+  "blocks" : [
+    {
+      "block_id" : "dyBy",
+      "type" : "rich_text",
+      "elements" : [
+        {
+          "elements" : [
+            {
+              "url" : "https:\/\/developer.apple.com\/",
+              "type" : "link"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "user_id" : "U0000000002",
+              "type" : "user"
+            },
+            {
+              "text" : " ++",
+              "type" : "text"
+            }
+          ],
+          "type" : "rich_text_section"
+        }
+      ]
+    }
+  ],
+  "event_ts" : "1593110391.000600",
+  "type" : "message",
+  "channel_type" : "im",
+  "ts" : "1593110391.000600",
+  "channel" : "D0000000000",
+  "text" : "<https:\/\/developer.apple.com\/> <@U0000000002> ++",
+  "team" : "T00000000"
+}
