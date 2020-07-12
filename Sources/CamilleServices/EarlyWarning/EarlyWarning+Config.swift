@@ -46,7 +46,8 @@ extension SlackBot.EarlyWarning {
                 "ktumail.com",
                 "tastrg.com",
                 "andsee.org",
-                "gomail5.com"
+                "gomail5.com",
+                "mailerv.net"
             ]
 
             return .init(alertChannel: "admins", emailChannel: "new-users", domains: Set(blocklist + domains))
