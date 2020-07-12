@@ -23,6 +23,10 @@ extension SlackBot.EarlyWarning {
         public static func `default`() throws -> Config {
             let blocklistUrl = URL(string: "https://raw.githubusercontent.com/martenson/disposable-email-domains/master/disposable_email_blocklist.conf")!
             let blocklist = try Array(import: blocklistUrl, delimiters: .newlines)
+            
+            let blocklistUrl2 = URL(string: "https://raw.githubusercontent.com/andreis/disposable-email-domains/master/domains.txt")!
+            let blocklist2 = try Array(import: blocklistUrl, delimiters: .newlines)
+            
 
             let domains = [
                 "apkmd.com",
@@ -51,7 +55,7 @@ extension SlackBot.EarlyWarning {
                 "eoopy.com"
             ]
 
-            return .init(alertChannel: "admins", emailChannel: "new-users", domains: Set(blocklist + domains))
+            return .init(alertChannel: "admins", emailChannel: "new-users", domains: Set(blocklist + blocklist2 + domains))
         }
     }
 }
