@@ -25,7 +25,7 @@ extension SlackBot.EarlyWarning {
             let blocklist = try Array(import: blocklistUrl, delimiters: .newlines)
             
             let blocklistUrl2 = URL(string: "https://raw.githubusercontent.com/andreis/disposable-email-domains/master/domains.txt")!
-            let blocklist2 = try Array(import: blocklistUrl, delimiters: .newlines)
+            let blocklist2 = try Array(import: blocklistUrl2, delimiters: .newlines)
             
 
             let domains = [
