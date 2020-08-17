@@ -29,7 +29,8 @@ let bot = try SlackBot
 
 bot.listen(for: .error) { bot, error in
     let channel = Identifier<Channel>(rawValue: "#camille_errors")
-    try bot.perform(.speak(in: channel, "\("Error: ", .bold) \(error.legibleLocalizedDescription, .code)"))
+    try bot.perform(.speak(in: channel, "\("Error: ", .bold)"))
+    try bot.perform(.upload(channels: [channel], filetype: .javascript, Data(error.legibleLocalizedDescription.utf8)))
 }
 
 
