@@ -54,7 +54,9 @@ extension SlackBot.EarlyWarning {
                 "mailerv.net",
                 "eoopy.com",
                 "mail2paste.com",
-                "vmani.com"
+                "vmani.com",
+                "miucce.online",
+                "avxrja.com"
             ]
 
             return .init(alertChannel: "admins", emailChannel: "new-users", domains: Set(blocklist + blocklist2 + domains))
