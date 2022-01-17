@@ -6,7 +6,7 @@
         "repositoryURL": "https://github.com/ChameleonBot/Chameleon.git",
         "state": {
           "branch": "revamp",
-          "revision": "ab61e3c193673032f756e1a31fa1e0b08a890087",
+          "revision": "4856b6068e9763ffe881266190ee59fb93061c17",
           "version": null
         }
       },
@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/vapor/core.git",
         "state": {
           "branch": null,
-          "revision": "1782c550512dc5a43d0bca405e28fc386d932bbf",
-          "version": "3.10.0"
+          "revision": "89c6989fd8b1e08acfd198afba1c38971bb814b2",
+          "version": "3.10.1"
         }
       },
       {
@@ -33,8 +33,8 @@
         "repositoryURL": "https://github.com/vapor/crypto.git",
         "state": {
           "branch": null,
-          "revision": "df8eb7d8ae51787b3a0628aa3975e67666da936c",
-          "version": "3.3.3"
+          "revision": "105c2f875588bf40dd24c00cef3644bf8e327770",
+          "version": "3.4.1"
         }
       },
       {
@@ -51,8 +51,8 @@
         "repositoryURL": "https://github.com/vapor/http.git",
         "state": {
           "branch": null,
-          "revision": "fba1329cd430e2f9a3f995b317b04f268d8b2978",
-          "version": "3.3.2"
+          "revision": "0464b715a4b59f54078bcf7a4b424767b03db5a5",
+          "version": "3.4.0"
         }
       },
       {
@@ -69,8 +69,8 @@
         "repositoryURL": "https://github.com/vapor/multipart.git",
         "state": {
           "branch": null,
-          "revision": "a7e0db512ff7eee7cd91d0a69dfeeec36f74d604",
-          "version": "3.1.2"
+          "revision": "fb216c5a8ef07dcd90aec8a4155e86c831acce97",
+          "version": "3.1.3"
         }
       },
       {
@@ -105,8 +105,8 @@
         "repositoryURL": "https://github.com/apple/swift-nio.git",
         "state": {
           "branch": null,
-          "revision": "8da5c5a4e6c5084c296b9f39dc54f00be146e0fa",
-          "version": "1.14.2"
+          "revision": "546610d52b19be3e19935e0880bb06b9c03f5cef",
+          "version": "1.14.4"
         }
       },
       {

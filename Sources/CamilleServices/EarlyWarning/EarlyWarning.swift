@@ -18,7 +18,10 @@ extension SlackBot {
 
             guard let channel = destination else { return }
 
-            try bot.perform(.speak(in: channel, "New user \(user) has joined with the email \(email)"))
+            let ip = try bot.perform(.teamAccessLogs(count: 20)).logins.first(where: { $0.user_id == user.id })?.ip
+            let ipString = ip.map { " (IP: \($0))" } ?? ""
+
+            try bot.perform(.speak(in: channel, "New user \(user) has joined with the email \(email)\(ipString)"))
         }
 
         return self
