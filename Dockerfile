@@ -21,7 +21,7 @@ WORKDIR /build
 # RUN ls -a
 
 # NIO deps
-RUN apt-get update && apt-get install -y wget curl libcurl3
+RUN apt-get update && apt-get install -y wget curl
 RUN apt-get update && apt-get install -y libssl-dev libicu-dev
 
 # Copy entire repo into container
@@ -51,9 +51,18 @@ RUN find -L "$(swift build --package-path /build -c release --show-bin-path)/" -
 FROM ubuntu:focal
 
 # Make sure all system packages are up to date.
-RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true && \
-    apt-get -q update && apt-get -q dist-upgrade -y && apt-get -q install -y ca-certificates && \
-    rm -r /var/lib/apt/lists/*
+RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true \
+    && apt-get -q update \
+    && apt-get -q dist-upgrade -y \
+    && apt-get -q install -y \
+      ca-certificates \
+      tzdata \
+# If your app or its dependencies import FoundationNetworking, also install `libcurl4`.
+      libcurl4 \
+# If your app or its dependencies import FoundationXML, also install `libxml2`.
+      # libxml2 \
+    && rm -r /var/lib/apt/lists/*
+
 
 # Create a vapor user and group with /prod as its home directory
 RUN useradd --user-group --create-home --system --skel /dev/null --home-dir /prod vapor
