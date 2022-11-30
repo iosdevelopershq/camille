@@ -20,13 +20,16 @@ WORKDIR /build
 # COPY ./Package.* ./
 # RUN ls -a
 
+# NIO deps
+RUN apt-get update && apt-get install -y wget
+RUN apt-get update && apt-get install -y lsof dnsutils netcat-openbsd net-tools curl jq # used by integration tests
+
 # Copy entire repo into container
 COPY . .
 RUN swift package resolve -v
 
 # Build everything, with optimizations
-#RUN swift build -c release --static-swift-stdlib
-RUN swift build -c release
+RUN swift build -c release --static-swift-stdlib
 
 # Switch to the staging area
 WORKDIR /staging
