@@ -21,8 +21,7 @@ WORKDIR /build
 # RUN ls -a
 
 # NIO deps
-RUN apt-get update && apt-get install -y wget
-RUN apt-get update && apt-get install -y lsof dnsutils netcat-openbsd net-tools curl jq # used by integration tests
+RUN apt-get update && apt-get install -y libssl-dev libicu-dev
 
 # Copy entire repo into container
 COPY . .
