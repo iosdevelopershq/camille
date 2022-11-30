@@ -21,6 +21,7 @@ WORKDIR /build
 # RUN ls -a
 
 # NIO deps
+RUN apt-get update && apt-get install -y wget curl
 RUN apt-get update && apt-get install -y libssl-dev libicu-dev
 
 # Copy entire repo into container
